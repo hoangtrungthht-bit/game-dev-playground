@@ -244,8 +244,10 @@ export function useCultivation() {
     s: GameState,
     reward: AdventureReward,
     stage: number,
-  ): Partial<GameState> => {
-    const herbs = reward.herbId ? { ...s.herbs, [reward.herbId]: s.herbs[reward.herbId as HerbId] + (reward.herbQty ?? 1) } : undefined;
+  ): { herbs: Record<HerbId, number>; artifacts: string[]; stones: number; qi: number; artifactText: string } => {
+    const herbs = reward.herbId
+      ? { ...s.herbs, [reward.herbId]: s.herbs[reward.herbId as HerbId] + (reward.herbQty ?? 1) }
+      : s.herbs;
     let artifacts = s.artifacts;
     let artifactText = "";
     if (reward.artifact) {
@@ -261,7 +263,7 @@ export function useCultivation() {
       }
     }
     return {
-      ...(herbs && { herbs }),
+      herbs,
       artifacts,
       stones: reward.stones ? Math.max(0, s.stones + reward.stones) : s.stones,
       qi: reward.qiPct ? Math.max(0, s.qi + qiNeeded(s) * reward.qiPct) : s.qi,
