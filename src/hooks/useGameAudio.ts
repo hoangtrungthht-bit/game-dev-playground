@@ -58,7 +58,7 @@ export function useGameAudio() {
 
     const notes = [261.63, 293.66, 329.63, 392, 329.63, 293.66, 246.94, 293.66];
     const playNext = () => {
-      const note = notes[noteRef.current % notes.length] ?? notes[0];
+      const note = notes[noteRef.current % notes.length] ?? 261.63;
       noteRef.current += 1;
       const start = context.currentTime + 0.02;
       playTone(context, note, start, 1.35, 0.022, "sine");

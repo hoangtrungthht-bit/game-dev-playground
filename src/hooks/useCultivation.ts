@@ -131,7 +131,7 @@ export function useCultivation() {
   }, [loaded]);
 
   const announce = useCallback((text: string, kind: GameNoticeKind, sound?: GameNotice["sound"]) => {
-    setFlash({ id: ++logId, text, kind, sound });
+    setFlash({ id: ++logId, text, kind, ...(sound ? { sound } : {}) });
   }, []);
 
   const meditate = useCallback(() => {
