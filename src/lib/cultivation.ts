@@ -190,6 +190,7 @@ export interface GameState {
   brewing: { pill: PillId; endsAt: number } | null;
   buffUntil: number;
   exploringUntil: number;
+  pendingAdventure: import("@/utils/adventureLogic").ModalEventData | null;
   failures: number;
   breakthroughs: number;
   log: LogEntry[];
@@ -216,6 +217,7 @@ export function newGame(): GameState {
     brewing: null,
     buffUntil: 0,
     exploringUntil: 0,
+    pendingAdventure: null,
     failures: 0,
     breakthroughs: 0,
     log: [

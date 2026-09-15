@@ -21,6 +21,7 @@ import {
   rollEncounter,
   stageIndex,
 } from "@/lib/cultivation";
+import { rollModalEvent, type ModalEventData, type AdventureReward } from "@/utils/adventureLogic";
 
 export type GameNoticeKind = "minor" | "major" | "alchemy" | "gain" | "loss";
 export interface GameNotice {
@@ -239,10 +240,53 @@ export function useCultivation() {
     });
   }, []);
 
+  const applyAdventureRewards = (
+    s: GameState,
+    reward: AdventureReward,
+    stage: number,
+  ): { herbs: Record<HerbId, number>; artifacts: string[]; stones: number; qi: number; artifactText: string } => {
+    const herbs = reward.herbId
+      ? { ...s.herbs, [reward.herbId]: s.herbs[reward.herbId as HerbId] + (reward.herbQty ?? 1) }
+      : s.herbs;
+    let artifacts = s.artifacts;
+    let artifactText = "";
+    if (reward.artifact) {
+      const pool = ARTIFACTS.filter(
+        (a) => !s.artifacts.includes(a.id) && a.mult <= 0.4 + stage * 0.12,
+      );
+      const got = pool[Math.floor(Math.random() * pool.length)];
+      if (got) {
+        artifacts = [...artifacts, got.id];
+        artifactText = ` Ngươi nhận được ${got.name} (${got.rarity})!`;
+      } else {
+        artifactText = " Tiếc thay bên trong chỉ còn lại bụi trần.";
+      }
+    }
+    return {
+      herbs,
+      artifacts,
+      stones: reward.stones ? Math.max(0, s.stones + reward.stones) : s.stones,
+      qi: reward.qiPct ? Math.max(0, s.qi + qiNeeded(s) * reward.qiPct) : s.qi,
+      artifactText,
+    };
+  };
+
   const explore = useCallback(() => {
     setState((s) => {
       if (Date.now() < s.exploringUntil) return s;
       const stage = stageIndex(s);
+
+      // 5% kích hoạt Kỳ Ngộ modal
+      if (Math.random() < 0.05) {
+        const event = rollModalEvent(Math.random);
+        return {
+          ...s,
+          pendingAdventure: event,
+          exploringUntil: Date.now() + 6000,
+          log: pushLog(s.log, `Kỳ ngộ hiện ra: ${event.title}!`, "epic"),
+        };
+      }
+
       const e = rollEncounter(stage, Math.random);
       const herbs = { ...s.herbs };
       if (e.herb && e.herbQty) herbs[e.herb] += e.herbQty;
@@ -282,6 +326,42 @@ export function useCultivation() {
         qi: Math.max(0, s.qi + qiNeeded(s) * (e.qiPct ?? 0)),
         exploringUntil: Date.now() + 6000,
         log: pushLog(s.log, text, e.kind),
+      };
+    });
+  }, [announce]);
+
+  const resolveAdventure = useCallback((optionIndex: 1 | 2) => {
+    setState((s) => {
+      if (!s.pendingAdventure) return s;
+      const event = s.pendingAdventure;
+      const option = optionIndex === 1 ? event.option1 : event.option2;
+      const stage = stageIndex(s);
+      const meetsReq = option.reqElement ? s.root?.element === option.reqElement : true;
+      const win = meetsReq && Math.random() < option.winRate;
+      const reward = applyAdventureRewards(s, win ? option.rewards : option.penalties, stage);
+
+      const herbName =
+        win && option.rewards.herbId
+          ? HERBS.find((h) => h.id === option.rewards.herbId)!.name
+          : "";
+      let text = win ? option.successText : option.failText;
+      if (win && option.rewards.herbQty && herbName) text += ` (+${option.rewards.herbQty} ${herbName})`;
+      if (reward.artifactText) text += reward.artifactText;
+
+      announce(
+        `${event.title}: ${text}`,
+        win ? "gain" : "loss",
+        win ? "resource" : undefined,
+      );
+
+      return {
+        ...s,
+        pendingAdventure: null,
+        herbs: reward.herbs,
+        artifacts: reward.artifacts,
+        stones: reward.stones,
+        qi: reward.qi,
+        log: pushLog(s.log, text, win ? "good" : "bad"),
       };
     });
   }, [announce]);
@@ -340,6 +420,6 @@ export function useCultivation() {
     now,
     loaded,
     flash,
-    actions: { meditate, breakthrough, brew, usePill, explore, equip, rename, reset, onboard, learnManual, equipManual },
+    actions: { meditate, breakthrough, brew, usePill, explore, equip, rename, reset, onboard, learnManual, equipManual, resolveAdventure },
   };
 }

@@ -27,6 +27,7 @@ import {
 import { useCultivation } from "@/hooks/useCultivation";
 import { useGameAudio } from "@/hooks/useGameAudio";
 import { cn } from "@/lib/utils";
+import { AdventureModal } from "@/components/AdventureModal";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -480,6 +481,14 @@ function Game() {
       )}
 
       {flash && <EventToast key={flash.id} notice={flash} />}
+
+      {loaded && state.pendingAdventure && (
+        <AdventureModal
+          event={state.pendingAdventure}
+          root={state.root}
+          onSelect={(idx) => actions.resolveAdventure(idx)}
+        />
+      )}
 
       {showOnboarding && (
         <OnboardingModal
