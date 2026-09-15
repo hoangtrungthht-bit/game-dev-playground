@@ -84,10 +84,12 @@ export function useGameAudio() {
     };
   }, [enabled, ready, startMusic, stopMusic]);
 
-  useEffect(() => () => {
-    stopMusic();
-    void contextRef.current?.close();
-  }, [stopMusic]);
+  useEffect(() => {
+    return () => {
+      bgmRef.current?.pause();
+      void contextRef.current?.close();
+    };
+  }, []);
 
   const toggle = useCallback(() => {
     setEnabled((current) => {
