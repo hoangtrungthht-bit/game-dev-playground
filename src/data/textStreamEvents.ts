@@ -234,8 +234,8 @@ export function generate1000TextEvents() {
   let id = 1;
 
   for (let i = 0; i < 1000; i++) {
-    const act = ACTIONS[i % ACTIONS.length];
-    const evt = EVENTS[i % EVENTS.length];
+    const act = ACTIONS[i % ACTIONS.length]!;
+    const evt = EVENTS[i % EVENTS.length]!;
 
     // Tạo biến thể hệ số (1x -> 3x) ngẫu nhiên để phần thưởng/hình phạt linh hoạt
     const variance = (i % 3) + 1;
