@@ -482,6 +482,14 @@ function Game() {
 
       {flash && <EventToast key={flash.id} notice={flash} />}
 
+      {loaded && state.pendingAdventure && (
+        <AdventureModal
+          event={state.pendingAdventure}
+          root={state.root}
+          onSelect={(idx) => actions.resolveAdventure(idx)}
+        />
+      )}
+
       {showOnboarding && (
         <OnboardingModal
           onConfirm={(name, gender, digits) => {
