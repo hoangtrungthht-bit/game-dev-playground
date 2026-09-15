@@ -190,35 +190,11 @@ export interface GameState {
   brewing: { pill: PillId; endsAt: number } | null;
   buffUntil: number;
   exploringUntil: number;
-  pendingAdventure: ModalEventData | null;
+  pendingAdventure: import("@/utils/adventureLogic").ModalEventData | null;
   failures: number;
   breakthroughs: number;
   log: LogEntry[];
   lastSeen: number;
-}
-
-export interface ModalEventData {
-  id: string;
-  title: string;
-  description: string;
-  option1: {
-    text: string;
-    winRate: number;
-    reqElement?: import("@/lib/cultivation").ElementId;
-    successText: string;
-    failText: string;
-    rewards: { stones?: number; qiPct?: number; herbId?: string; herbQty?: number; artifact?: boolean };
-    penalties: { stones?: number; qiPct?: number };
-  };
-  option2: {
-    text: string;
-    winRate: number;
-    reqElement?: import("@/lib/cultivation").ElementId;
-    successText: string;
-    failText: string;
-    rewards: { stones?: number; qiPct?: number; herbId?: string; herbQty?: number; artifact?: boolean };
-    penalties: { stones?: number; qiPct?: number };
-  };
 }
 
 export const SAVE_KEY = "tu-tien-save-v1";
