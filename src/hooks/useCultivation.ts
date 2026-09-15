@@ -418,6 +418,6 @@ export function useCultivation() {
     now,
     loaded,
     flash,
-    actions: { meditate, breakthrough, brew, usePill, explore, equip, rename, reset, onboard, learnManual, equipManual },
+    actions: { meditate, breakthrough, brew, usePill, explore, equip, rename, reset, onboard, learnManual, equipManual, resolveAdventure },
   };
 }
