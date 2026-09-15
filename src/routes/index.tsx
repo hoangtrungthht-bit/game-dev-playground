@@ -27,6 +27,7 @@ import {
 import { useCultivation } from "@/hooks/useCultivation";
 import { useGameAudio } from "@/hooks/useGameAudio";
 import { cn } from "@/lib/utils";
+import { AdventureModal } from "@/components/AdventureModal";
 
 export const Route = createFileRoute("/")({
   head: () => ({
