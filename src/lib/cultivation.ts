@@ -217,6 +217,7 @@ export function newGame(): GameState {
     brewing: null,
     buffUntil: 0,
     exploringUntil: 0,
+    pendingAdventure: null,
     failures: 0,
     breakthroughs: 0,
     log: [
