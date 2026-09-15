@@ -21,6 +21,7 @@ import {
   rollEncounter,
   stageIndex,
 } from "@/lib/cultivation";
+import { rollModalEvent, type ModalEventData, type AdventureReward } from "@/utils/adventureLogic";
 
 export type GameNoticeKind = "minor" | "major" | "alchemy" | "gain" | "loss";
 export interface GameNotice {
