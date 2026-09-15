@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const AUDIO_KEY = "tien-lo-audio-enabled";
+const BGM_URL = "/bgm.mp3";
 
 type SoundEffect = "breakthrough" | "alchemy" | "resource";
 
@@ -29,8 +30,7 @@ export function useGameAudio() {
   const [enabled, setEnabled] = useState(false);
   const [ready, setReady] = useState(false);
   const contextRef = useRef<AudioContext | null>(null);
-  const musicTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const noteRef = useRef(0);
+  const bgmRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     try {
@@ -46,37 +46,37 @@ export function useGameAudio() {
     return contextRef.current;
   }, []);
 
-  const stopMusic = useCallback(() => {
-    if (musicTimerRef.current) clearInterval(musicTimerRef.current);
-    musicTimerRef.current = null;
+  const getBgm = useCallback(() => {
+    if (!bgmRef.current) {
+      const audio = new Audio(BGM_URL);
+      audio.loop = true;
+      audio.volume = 0.2;
+      audio.preload = "auto";
+      bgmRef.current = audio;
+    }
+    return bgmRef.current;
   }, []);
 
-  const startMusic = useCallback(async () => {
-    const context = getContext();
-    if (context.state === "suspended") await context.resume();
-    if (context.state !== "running" || musicTimerRef.current) return;
+  const startMusic = useCallback(() => {
+    const bgm = getBgm();
+    void bgm.play().catch(() => {
+      /* Trình duyệt chưa cho phát âm thanh, chờ thao tác tiếp theo. */
+    });
+  }, [getBgm]);
 
-    const notes = [261.63, 293.66, 329.63, 392, 329.63, 293.66, 246.94, 293.66];
-    const playNext = () => {
-      const note = notes[noteRef.current % notes.length] ?? 261.63;
-      noteRef.current += 1;
-      const start = context.currentTime + 0.02;
-      playTone(context, note, start, 1.35, 0.022, "sine");
-      playTone(context, note * 0.5, start, 1.6, 0.012, "triangle");
-    };
-    playNext();
-    musicTimerRef.current = setInterval(playNext, 1150);
-  }, [getContext]);
+  const stopMusic = useCallback(() => {
+    bgmRef.current?.pause();
+  }, []);
 
   useEffect(() => {
     if (!ready || !enabled) {
       stopMusic();
       return;
     }
-    const unlock = () => void startMusic();
-    window.addEventListener("pointerdown", unlock, { once: true });
-    window.addEventListener("keydown", unlock, { once: true });
-    void startMusic();
+    const unlock = () => startMusic();
+    window.addEventListener("pointerdown", unlock);
+    window.addEventListener("keydown", unlock);
+    startMusic();
     return () => {
       window.removeEventListener("pointerdown", unlock);
       window.removeEventListener("keydown", unlock);
@@ -97,7 +97,7 @@ export function useGameAudio() {
       } catch {
         /* Trình duyệt chặn bộ nhớ cục bộ. */
       }
-      if (next) void startMusic();
+      if (next) startMusic();
       else stopMusic();
       return next;
     });
