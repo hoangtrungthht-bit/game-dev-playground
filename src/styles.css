@@ -19,6 +19,9 @@
  */
 
 @theme inline {
+  --font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Noto Serif Display", "Playfair Display", ui-serif, Georgia, serif;
+  --color-jade: var(--jade);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -63,38 +66,40 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
+  /* Mực nho đêm khuya + ngọc bích + kim sa */
+  --background: oklch(0.16 0.018 250);
+  --foreground: oklch(0.93 0.012 90);
+  --card: oklch(0.21 0.02 250);
+  --card-foreground: oklch(0.93 0.012 90);
+  --popover: oklch(0.21 0.02 250);
+  --popover-foreground: oklch(0.93 0.012 90);
+  --primary: oklch(0.82 0.13 85);
+  --primary-foreground: oklch(0.18 0.02 250);
+  --secondary: oklch(0.27 0.022 250);
+  --secondary-foreground: oklch(0.93 0.012 90);
+  --muted: oklch(0.27 0.022 250);
+  --muted-foreground: oklch(0.7 0.02 250);
+  --accent: oklch(0.3 0.03 250);
+  --accent-foreground: oklch(0.93 0.012 90);
+  --destructive: oklch(0.66 0.19 25);
+  --destructive-foreground: oklch(0.97 0.01 90);
+  --border: oklch(0.34 0.025 250);
+  --input: oklch(0.34 0.025 250);
+  --ring: oklch(0.82 0.13 85);
+  --jade: oklch(0.78 0.13 165);
+  --chart-1: oklch(0.82 0.13 85);
+  --chart-2: oklch(0.78 0.13 165);
+  --chart-3: oklch(0.66 0.19 25);
+  --chart-4: oklch(0.7 0.12 250);
+  --chart-5: oklch(0.75 0.1 320);
+  --sidebar: oklch(0.19 0.02 250);
+  --sidebar-foreground: oklch(0.93 0.012 90);
+  --sidebar-primary: oklch(0.82 0.13 85);
+  --sidebar-primary-foreground: oklch(0.18 0.02 250);
+  --sidebar-accent: oklch(0.27 0.022 250);
+  --sidebar-accent-foreground: oklch(0.93 0.012 90);
+  --sidebar-border: oklch(0.34 0.025 250);
+  --sidebar-ring: oklch(0.82 0.13 85);
 }
 
 .dark {
@@ -140,5 +145,76 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+  }
+}
+
+@utility ink-bg {
+  background-image:
+    radial-gradient(ellipse 70% 50% at 50% -10%, oklch(0.82 0.13 85 / 0.12), transparent),
+    radial-gradient(ellipse 60% 45% at 10% 100%, oklch(0.78 0.13 165 / 0.1), transparent);
+  background-attachment: fixed;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+  }
+  .font-serif {
+    font-family: var(--font-serif);
+    letter-spacing: 0.01em;
+  }
+}
+
+/* Bảng nhân vật nền ngũ hành tối (Thủy/Hỏa): chữ sáng để dễ đọc */
+.root-panel-dark {
+  color: #fafafa;
+}
+.root-panel-dark .text-muted-foreground {
+  color: rgb(244 244 245 / 0.75);
+}
+.root-panel-dark .border-border,
+.root-panel-dark .border-border\/60 {
+  border-color: rgb(255 255 255 / 0.28);
+}
+.root-panel-dark .bg-background\/40,
+.root-panel-dark .bg-background\/70 {
+  background-color: rgb(0 0 0 / 0.28);
+}
+.root-panel-dark .text-primary {
+  color: #fde68a;
+}
+
+@keyframes event-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes realm-aura {
+  0%, 100% {
+    box-shadow: 0 0 18px oklch(0.82 0.13 85 / 0.35);
+  }
+  50% {
+    box-shadow: 0 0 42px oklch(0.82 0.13 85 / 0.7), inset 0 0 24px oklch(0.82 0.13 85 / 0.12);
+  }
+}
+
+.event-toast {
+  animation: event-toast-in 220ms ease-out both;
+}
+
+.event-toast-major {
+  animation: event-toast-in 260ms ease-out both, realm-aura 1.15s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-toast,
+  .event-toast-major {
+    animation: none;
   }
 }
