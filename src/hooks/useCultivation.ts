@@ -357,7 +357,7 @@ export function useCultivation() {
       return {
         ...s,
         pendingAdventure: null,
-        herbs: reward.herbs ?? s.herbs,
+        herbs: reward.herbs,
         artifacts: reward.artifacts,
         stones: reward.stones,
         qi: reward.qi,
