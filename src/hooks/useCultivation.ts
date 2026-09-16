@@ -286,7 +286,7 @@ export function useCultivation() {
       }
 
       // Sự kiện thường (95%): lấy ngẫu nhiên từ kho 1.000 biến thể Text Stream
-      const randomEvent = TEXT_STREAM_EVENTS[Math.floor(Math.random() * TEXT_STREAM_EVENTS.length)];
+      const randomEvent = TEXT_STREAM_EVENTS[Math.floor(Math.random() * TEXT_STREAM_EVENTS.length)]!;
       const text = randomEvent.message;
       const stones = randomEvent.baseLinhThach;
       const qi = randomEvent.baseLinhKhi;
