@@ -276,6 +276,76 @@ export function breakthroughChance(s: GameState): number {
 }
 
 
+export interface Encounter {
+  text: string;
+  kind: LogEntry["kind"];
+  stones?: number;
+  herb?: HerbId;
+  herbQty?: number;
+  qiPct?: number;
+  artifact?: boolean;
+}
+
+export function rollEncounter(stage: number, rng: () => number): Encounter {
+  const tierCap = Math.min(4, 1 + Math.floor(stage / 8));
+  const herbPool = HERBS.filter((h) => h.tier <= tierCap);
+  const herb = herbPool[Math.floor(rng() * herbPool.length)]!;
+  const roll = rng();
+  const gold = Math.floor((8 + stage * 6) * (0.6 + rng()));
+
+  if (roll < 0.3)
+    return {
+      text: `Ngươi tìm được một khóm ${herb.name} mọc bên vách núi sương phủ.`,
+      kind: "good",
+      herb: herb.id,
+      herbQty: 1 + Math.floor(rng() * 3),
+    };
+  if (roll < 0.5)
+    return {
+      text: `Đánh bại một con yêu thú lang thang, thu được ${gold} linh thạch.`,
+      kind: "good",
+      stones: gold,
+    };
+  if (roll < 0.62)
+    return {
+      text: "Ngươi lạc vào một sơn động cổ, cảm ngộ vết kiếm trên vách đá, linh khí trong người dâng trào.",
+      kind: "good",
+      qiPct: 0.2,
+    };
+  if (roll < 0.72)
+    return {
+      text: "Một tán tu bày quầy giữa rừng, ngươi đổi chút vật phẩm lấy dược liệu quý.",
+      kind: "good",
+      herb: herb.id,
+      herbQty: 2,
+      stones: -Math.min(gold, 20),
+    };
+  if (roll < 0.8)
+    return {
+      text: "Trúng mai phục của ma tu! Ngươi liều mạng chạy thoát nhưng khí tức tổn hao.",
+      kind: "bad",
+      qiPct: -0.15,
+    };
+  if (roll < 0.88)
+    return {
+      text: `Bị đám sơn tặc chặn đường, mất ${Math.floor(gold / 2)} linh thạch mua đường.`,
+      kind: "bad",
+      stones: -Math.floor(gold / 2),
+    };
+  if (roll < 0.96)
+    return {
+      text: "Ngươi ngồi thiền bên suối linh, một đêm trôi qua như chớp mắt.",
+      kind: "info",
+      qiPct: 0.1,
+    };
+  return {
+    text: "Di tích thượng cổ hé mở! Trong quan tài ngọc có một kiện pháp bảo phong ấn.",
+    kind: "epic",
+    artifact: true,
+    stones: gold * 2,
+  };
+}
+
 export function fmt(n: number): string {
   if (n < 1000) return n.toFixed(n < 10 && !Number.isInteger(n) ? 1 : 0);
   const units = ["K", "M", "B", "T", "Kt", "Mt"];
