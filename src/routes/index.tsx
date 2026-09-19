@@ -121,7 +121,7 @@ function Game() {
     <div className="min-h-screen bg-[#0b0f17] text-foreground ink-bg">
       <div className="mx-auto w-full max-w-[1180px] px-2 pb-12 pt-3 sm:px-6 sm:pb-20 sm:pt-8">
         <header
-          className="root-aura rounded-2xl border border-primary/25 bg-[#121824] p-3.5 shadow-2xl sm:p-5"
+          className="root-aura rounded-2xl border border-border bg-black p-3.5 shadow-2xl sm:p-5"
           style={rootAuraStyle(state.root)}
         >
           <div className="flex items-start justify-between gap-3">
