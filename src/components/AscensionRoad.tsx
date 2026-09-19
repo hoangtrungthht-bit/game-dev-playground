@@ -29,12 +29,9 @@ export function AscensionRoad({ seed, realm, revealIndex, onRevealDone }: Props)
 
   return (
     <div className="mt-5" aria-label="Đăng Tiên Lộ — Thiên Mệnh Đạo Cốt">
-      <div className="flex items-baseline justify-between gap-2 px-1">
+      <div className="px-1">
         <p className="font-sans text-[10px] uppercase tracking-[0.28em] text-primary/80">
           Đăng Tiên Lộ
-        </p>
-        <p className="font-mono text-[10px] text-muted-foreground">
-          Thiên Mệnh Đạo Cốt {unlocked}/{SEGMENT_COUNT}
         </p>
       </div>
 
@@ -69,12 +66,18 @@ export function AscensionRoad({ seed, realm, revealIndex, onRevealDone }: Props)
               >
                 <span
                   className={cn(
-                    "rounded border px-1.5 py-0.5 font-mono text-[11px] font-bold tabular-nums transition",
-                    isUnlocked
-                      ? "border-primary/60 bg-primary/10 text-primary shadow-[0_0_10px_rgba(245,158,11,0.35)]"
-                      : "border-border bg-secondary/60 text-muted-foreground/70",
+                    "font-mono text-[11px] font-bold tabular-nums transition",
+                    isUnlocked ? "text-primary" : "text-muted-foreground/70",
                     isAnimating && "seed-segment-reveal",
                   )}
+                  style={
+                    isUnlocked
+                      ? {
+                          textShadow:
+                            "0 0 6px rgba(245,158,11,0.9), 0 0 16px rgba(245,158,11,0.5)",
+                        }
+                      : undefined
+                  }
                 >
                   {isUnlocked ? segment : "???"}
                 </span>
