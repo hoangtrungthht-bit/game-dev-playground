@@ -132,9 +132,6 @@ function Game() {
               <h1 className="mt-0.5 truncate font-serif text-xl font-semibold leading-tight tracking-wide sm:text-4xl">
                 Con đường tu tiên
               </h1>
-              <span className="mt-0.5 block font-sans text-[10px] font-bold uppercase tracking-[0.18em] text-primary sm:text-xs">
-                Đăng Tiên Lộ
-              </span>
             </div>
             <button
               onClick={audio.toggle}
