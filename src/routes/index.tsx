@@ -29,6 +29,7 @@ import { useGameAudio } from "@/hooks/useGameAudio";
 import { cn } from "@/lib/utils";
 import { AdventureModal } from "@/components/AdventureModal";
 import { BreakthroughModal } from "@/components/BreakthroughModal";
+import { AscensionRoad } from "@/components/AscensionRoad";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -97,7 +98,7 @@ function spiritRootBadgeClass(root: SpiritRoot) {
 }
 
 function Game() {
-  const { state, now, loaded, flash, actions } = useCultivation();
+  const { state, now, loaded, flash, seedReveal, actions } = useCultivation();
   const audio = useGameAudio();
   const [tab, setTab] = useState<Tab>("tuluyen");
   const [resultRoot, setResultRoot] = useState<SpiritRoot | null>(null);
@@ -144,28 +145,13 @@ function Game() {
             </button>
           </div>
 
-          <div className="relative mt-6 flex items-center justify-between px-3 pb-1" aria-label="Tiến trình đăng tiên lộ">
-            <div className="absolute left-5 right-5 top-1/2 h-1 -translate-y-0.5 rounded-full bg-border" aria-hidden="true" />
-            {Array.from({ length: 9 }, (_, index) => {
-              const reached = index <= Math.min(8, stage);
-              return (
-                <div key={index} className="relative z-10 flex items-center justify-center">
-                  {index === 0 && reached && (
-                    <span className="absolute -top-6 whitespace-nowrap rounded border border-jade/50 bg-jade/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-jade">
-                      {stage + 1}
-                    </span>
-                  )}
-                  <span
-                    className={cn(
-                      "block rounded-full border-2",
-                      index === 0 && reached ? "size-4 border-primary bg-primary shadow-[0_0_12px_rgba(245,158,11,0.6)]" : "size-3.5 border-border bg-secondary",
-                      reached && index > 0 && "border-primary/70 bg-primary/70",
-                    )}
-                  />
-                </div>
-              );
-            })}
-          </div>
+          <AscensionRoad
+            seed={state.destinySeed}
+            realm={state.realm}
+            revealIndex={seedReveal}
+            onRevealDone={actions.dismissSeedReveal}
+          />
+
 
         </header>
 
