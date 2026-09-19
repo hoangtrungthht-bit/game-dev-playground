@@ -1,70 +1,49 @@
-import React from "react";
-import { elementName, type ModalEventData } from "@/utils/adventureLogic";
-import type { SpiritRoot } from "@/lib/cultivation";
+import React, { useState } from "react";
+import type { QuizEventData } from "@/utils/adventureLogic";
 
 interface AdventureModalProps {
-  event: ModalEventData;
-  root: SpiritRoot | null;
-  onSelect: (optionIndex: 1 | 2) => void;
+  event: QuizEventData;
+  stones: number;
+  onSelect: (answerIndex: number, wager: boolean) => void;
+  auraStyle?: React.CSSProperties | undefined;
 }
 
-export const AdventureModal: React.FC<AdventureModalProps> = ({ event, root, onSelect }) => {
-  const hasReqLinhCan = event.option1.reqElement
-    ? root?.element === event.option1.reqElement
-    : true;
+export const AdventureModal: React.FC<AdventureModalProps> = ({ event, stones, onSelect, auraStyle }) => {
+  const [wager, setWager] = useState(false);
+  const wagerAmount = Math.floor(stones * 0.3);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm animate-in fade-in">
-      <div
-        className="w-full max-w-lg rounded-xl border border-amber-500/50 bg-slate-900 p-6 text-slate-100 shadow-2xl shadow-amber-500/10"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="adventure-title"
-      >
-        <div className="mb-4 flex items-center justify-between border-b border-amber-500/30 pb-3">
-          <h3 id="adventure-title" className="font-serif text-xl font-bold text-amber-400">
-            {event.title}
-          </h3>
-          <span className="rounded border border-amber-500/40 bg-amber-500/20 px-2 py-1 text-xs text-amber-300">
-            Kỳ Ngộ 5%
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm animate-in fade-in">
+      <div className="root-aura w-full max-w-xl rounded-2xl border bg-card p-6 text-card-foreground shadow-2xl shadow-primary/10 sm:p-7" style={auraStyle} role="dialog" aria-modal="true" aria-labelledby="adventure-title">
+        <div className="mb-5 flex items-start justify-between gap-4 border-b border-border pb-4">
+          <div>
+            <p className="text-xs uppercase tracking-[0.25em] text-primary/80">Thử thách tâm cảnh</p>
+            <h3 id="adventure-title" className="mt-1 font-serif text-2xl font-semibold text-primary">{event.title}</h3>
+          </div>
+          <span className="shrink-0 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-primary">{event.realmName}</span>
+        </div>
+
+        <div className="rounded-xl border border-border bg-background/50 p-4">
+          <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Câu hỏi đạo tâm</p>
+          <p className="mt-2 text-base leading-relaxed">{event.question}</p>
+        </div>
+
+        <div className="mt-5 grid gap-2 sm:grid-cols-2">
+          {event.answers.map((answer, index) => (
+            <button key={answer} onClick={() => onSelect(index, wager)} className="min-h-14 rounded-xl border border-border bg-secondary/70 px-4 py-3 text-left text-sm transition hover:border-primary/70 hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+              <span className="mr-2 font-serif text-primary">{String.fromCharCode(65 + index)}.</span>{answer}
+            </button>
+          ))}
+        </div>
+
+        <button type="button" aria-pressed={wager} onClick={() => setWager((value) => !value)} className={`mt-5 flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition ${wager ? "border-amber-500/70 bg-amber-500/10" : "border-border bg-background/40 hover:border-amber-500/50"}`}>
+          <span>
+            <span className="block text-sm font-semibold">Cược 30% Linh Thạch</span>
+            <span className="mt-1 block text-xs text-muted-foreground">{wager ? `Cược hiện tại: ${wagerAmount} linh thạch · Đúng nhận 250%` : "Bật cược để thắng lớn, sai sẽ mất số tiền cược"}</span>
           </span>
-        </div>
-
-        <p className="mb-6 text-sm leading-relaxed text-slate-300">{event.description}</p>
-
-        <div className="space-y-3">
-          <button
-            onClick={() => onSelect(1)}
-            disabled={!hasReqLinhCan}
-            className={`w-full rounded-lg border p-3 text-left transition-all ${
-              hasReqLinhCan
-                ? "border-amber-500/60 bg-amber-950/40 text-amber-200 hover:bg-amber-900/60"
-                : "cursor-not-allowed border-slate-700 bg-slate-800/50 text-slate-500"
-            }`}
-          >
-            <div className="text-sm font-semibold">{event.option1.text}</div>
-            <div className="mt-1 text-xs opacity-75">
-              Tỷ lệ thành công: {Math.round(event.option1.winRate * 100)}%
-              {event.option1.reqElement && (
-                <span className={hasReqLinhCan ? "text-emerald-400" : "text-rose-400"}>
-                  {" "}
-                  (Yêu cầu: {elementName(event.option1.reqElement)} Linh Căn
-                  {root && hasReqLinhCan ? " — đã đạt" : root ? " — chưa đạt" : " — chưa khai mở"})
-                </span>
-              )}
-            </div>
-          </button>
-
-          <button
-            onClick={() => onSelect(2)}
-            className="w-full rounded-lg border border-slate-700 bg-slate-800/80 p-3 text-left text-slate-200 transition-all hover:bg-slate-800"
-          >
-            <div className="text-sm font-semibold">{event.option2.text}</div>
-            <div className="mt-1 text-xs text-slate-400">
-              Tỷ lệ thành công: {Math.round(event.option2.winRate * 100)}%
-            </div>
-          </button>
-        </div>
+          <span className={`relative h-6 w-11 rounded-full transition ${wager ? "bg-amber-500" : "bg-muted"}`}><span className={`absolute top-1 h-4 w-4 rounded-full bg-white transition ${wager ? "left-6" : "left-1"}`} /></span>
+        </button>
+        <p className="mt-3 text-center text-xs text-muted-foreground">Chọn đáp án để nhận kết quả ngay · Không có yêu cầu Linh Căn hay Cảnh Giới</p>
       </div>
     </div>
   );

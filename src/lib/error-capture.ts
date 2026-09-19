@@ -63,10 +63,17 @@ console.error = (...args: unknown[]) => {
 };
 
 if (typeof globalThis.addEventListener === "function") {
-  globalThis.addEventListener("error", (event) => record((event as ErrorEvent).error ?? event));
-  globalThis.addEventListener("unhandledrejection", (event) =>
-    record((event as PromiseRejectionEvent).reason),
-  );
+  globalThis.addEventListener("error", (event) => {
+    const errorEvent = event as ErrorEvent;
+    // Resource-loading events (for example an audio/image error) do not carry
+    // an exception. Recording the Event object turns into `{isTrusted:true}`
+    // and makes the preview report a misleading runtime error.
+    if (errorEvent.error instanceof Error) record(errorEvent.error);
+  });
+  globalThis.addEventListener("unhandledrejection", (event) => {
+    const reason = (event as PromiseRejectionEvent).reason;
+    if (reason instanceof Error || typeof reason === "string") record(reason);
+  });
 }
 
 export function consumeLastCapturedError(): unknown {

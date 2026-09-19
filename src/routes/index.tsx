@@ -28,6 +28,7 @@ import { useCultivation } from "@/hooks/useCultivation";
 import { useGameAudio } from "@/hooks/useGameAudio";
 import { cn } from "@/lib/utils";
 import { AdventureModal } from "@/components/AdventureModal";
+import { BreakthroughModal } from "@/components/BreakthroughModal";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -62,6 +63,39 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "nhatky", label: "Nhật Ký" },
 ];
 
+function spiritRootBadgeClass(root: SpiritRoot) {
+  const normalizedElement = String(root.element)
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\\u0300-\\u036f]/g, "");
+  const element = normalizedElement === "water" || normalizedElement === "thuy" ? "thuy" : normalizedElement;
+
+  if (element === "thuy") {
+    return cn(
+      "border-2 border-cyan-400 bg-cyan-950/80 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.5)]",
+      root.grade === "thuong" && "shadow-[0_0_15px_rgba(6,182,212,0.6)]",
+      root.grade === "cuc" && "shadow-[0_0_20px_rgba(6,182,212,0.72)]",
+    );
+  }
+
+  const gradeClasses = {
+    ha: "border border-opacity-50",
+    trung: "border-2 border-opacity-80",
+    thuong: "border-2 shadow-[0_0_15px_var(--root-glow)]",
+    cuc: "border-2 shadow-[0_0_20px_var(--root-glow)]",
+  }[root.grade];
+
+  const elementClasses = {
+    kim: "border-slate-200/80 bg-slate-100/10 text-slate-100 [--root-glow:rgba(226,232,240,0.68)]",
+    moc: "border-emerald-500/80 bg-emerald-950/40 text-emerald-300 [--root-glow:rgba(16,185,129,0.68)]",
+    hoa: "border-red-500/80 bg-red-950/40 text-red-300 [--root-glow:rgba(239,68,68,0.68)]",
+    tho: "border-amber-500/80 bg-amber-950/40 text-amber-300 [--root-glow:rgba(245,158,11,0.68)]",
+  }[element as "kim" | "moc" | "hoa" | "tho"];
+
+  return cn(gradeClasses, elementClasses);
+}
+
 function Game() {
   const { state, now, loaded, flash, actions } = useCultivation();
   const audio = useGameAudio();
@@ -83,44 +117,83 @@ function Game() {
   }, [flash?.id, flash?.sound, audio.playSfx]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground ink-bg">
-      <div className="mx-auto max-w-6xl px-3 pb-12 pt-5 sm:px-6 sm:pb-20 sm:pt-8">
-        <header className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 border-b border-border/60 pb-4 sm:flex sm:flex-wrap sm:justify-between sm:gap-4 sm:pb-5">
-          <div className="min-w-0">
-            <p className="font-serif text-xs uppercase tracking-[0.4em] text-primary/80">
-              Tiên Lộ Vô Tận
-            </p>
-            <h1 className="mt-1 truncate font-serif text-2xl font-semibold tracking-wide sm:text-4xl">
-              Con đường tu tiên
-            </h1>
+    <div className="min-h-screen bg-[#0b0f17] text-foreground ink-bg">
+      <div className="mx-auto w-full max-w-[1180px] px-2 pb-12 pt-3 sm:px-6 sm:pb-20 sm:pt-8">
+        <header
+          className="root-aura rounded-2xl border border-primary/25 bg-[#121824] p-3.5 shadow-2xl sm:p-5"
+          style={rootAuraStyle(state.root)}
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="font-sans text-[10px] uppercase tracking-[0.28em] text-primary/80 sm:text-xs sm:tracking-[0.4em]">
+                Tiên Lộ Vô Tận
+              </p>
+              <h1 className="mt-0.5 truncate font-serif text-xl font-semibold leading-tight tracking-wide sm:text-4xl">
+                Con đường tu tiên
+              </h1>
+              <span className="mt-0.5 block font-sans text-[10px] font-bold uppercase tracking-[0.18em] text-primary sm:text-xs">
+                Đăng Tiên Lộ
+              </span>
+            </div>
+            <button
+              onClick={audio.toggle}
+              className="rounded-md p-1.5 text-muted-foreground transition hover:text-foreground"
+              aria-label={audio.enabled ? "Tắt âm thanh" : "Bật âm thanh"}
+            >
+              {audio.enabled ? <Volume2 aria-hidden="true" /> : <VolumeX aria-hidden="true" />}
+            </button>
           </div>
-          <div className="col-span-2 grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-sm sm:col-auto sm:flex sm:gap-3">
-            <input
-              value={state.name}
-              onChange={(e) => actions.rename(e.target.value)}
-              className="min-h-11 min-w-0 w-full rounded-md border border-border bg-card/70 px-3 py-2 text-base outline-none focus:border-primary sm:min-h-0 sm:w-44 sm:py-1.5 sm:text-sm"
-              aria-label="Đạo hiệu"
-            />
-            <span className="shrink-0 rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-primary sm:py-1.5">
-              {fmt(state.stones)} linh thạch
-            </span>
+
+          <div className="relative mt-6 flex items-center justify-between px-3 pb-1" aria-label="Tiến trình đăng tiên lộ">
+            <div className="absolute left-5 right-5 top-1/2 h-1 -translate-y-0.5 rounded-full bg-border" aria-hidden="true" />
+            {Array.from({ length: 9 }, (_, index) => {
+              const reached = index <= Math.min(8, stage);
+              return (
+                <div key={index} className="relative z-10 flex items-center justify-center">
+                  {index === 0 && reached && (
+                    <span className="absolute -top-6 whitespace-nowrap rounded border border-jade/50 bg-jade/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-jade">
+                      {stage + 1}
+                    </span>
+                  )}
+                  <span
+                    className={cn(
+                      "block rounded-full border-2",
+                      index === 0 && reached ? "size-4 border-primary bg-primary shadow-[0_0_12px_rgba(245,158,11,0.6)]" : "size-3.5 border-border bg-secondary",
+                      reached && index > 0 && "border-primary/70 bg-primary/70",
+                    )}
+                  />
+                </div>
+              );
+            })}
           </div>
+
         </header>
 
-        <section className="mt-4 grid grid-cols-1 gap-4 sm:mt-6 sm:gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
+        <section className="mt-4 grid grid-cols-1 gap-4 sm:mt-6 sm:gap-6 md:grid-cols-12">
           {/* Bảng nhân vật */}
           <aside
             className={cn(
-              "root-panel min-w-0 rounded-xl border border-border bg-card/60 p-4 backdrop-blur sm:p-5",
+              "root-aura root-panel min-w-0 rounded-xl border bg-black p-4 backdrop-blur sm:p-5 md:col-span-4",
               state.root && ELEMENT_INFO[state.root.element].dark && GRADE_INFO[state.root.grade].opacity >= 0.5 && "root-panel-dark",
             )}
-            style={rootPanelStyle(state.root)}
+            style={{ ...rootPanelStyle(state.root), ...rootAuraStyle(state.root) }}
           >
+            <div className="mb-4 flex items-center justify-between gap-3 border-b border-border/70 bg-black pb-3">
+              <span className="truncate font-serif text-lg font-semibold text-foreground">{state.name}</span>
+              <span className="shrink-0 rounded-md border border-primary/40 bg-primary/10 px-2 py-1.5 text-xs text-primary">
+                {fmt(state.stones)} linh thạch
+              </span>
+            </div>
             <p className="text-xs uppercase tracking-widest text-muted-foreground">Cảnh giới</p>
             <h2 className="mt-1 font-serif text-2xl text-primary">{realmTitle(state)}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{REALMS[state.realm]!.desc}</p>
             {state.root && (
-              <p className="mt-2 inline-block rounded-md border border-border bg-background/40 px-2.5 py-1 text-xs font-medium">
+              <p
+                className={cn(
+                  "mt-2 inline-block rounded-md border px-2.5 py-1 text-xs font-semibold transition-colors",
+                  spiritRootBadgeClass(state.root),
+                )}
+              >
                 {rootTitle(state.root)}
               </p>
             )}
@@ -192,9 +265,9 @@ function Game() {
           </aside>
 
           {/* Khu vực chính */}
-          <main className="min-w-0 rounded-xl border border-border bg-card/40 backdrop-blur">
+          <main className="root-aura min-w-0 rounded-xl border bg-black backdrop-blur md:col-span-8" style={rootAuraStyle(state.root)}>
             <nav
-              className="grid grid-cols-3 gap-1.5 border-b border-border/70 p-2 sm:grid-cols-6 sm:gap-1"
+              className="grid grid-cols-3 gap-1.5 border-b border-border/70 p-2 md:grid-cols-6 md:gap-1"
               aria-label="Tính năng"
             >
               {TABS.map((t) => (
@@ -203,7 +276,7 @@ function Game() {
                   onClick={() => setTab(t.id)}
                   aria-current={tab === t.id ? "page" : undefined}
                   className={cn(
-                    "min-h-12 min-w-0 rounded-md px-2 py-2.5 text-sm font-medium leading-tight transition sm:min-h-10 sm:px-3.5 sm:py-2",
+                    "min-h-12 min-w-0 whitespace-nowrap rounded-md px-1 py-2.5 text-xs font-medium leading-tight transition md:min-h-10 md:px-1.5 md:py-2",
                     tab === t.id
                       ? "bg-primary/15 text-primary"
                       : "text-muted-foreground hover:text-foreground",
@@ -480,14 +553,24 @@ function Game() {
         </button>
       )}
 
-      {flash && <EventToast key={flash.id} notice={flash} />}
+      {flash?.breakthrough ? (
+        <BreakthroughModal
+          key={flash.id}
+          notice={flash}
+          root={state.root}
+          onClose={() => actions.dismissNotice()}
+        />
+      ) : flash ? (
+        <EventToast key={flash.id} notice={flash} />
+      ) : null}
 
       {loaded && state.pendingAdventure && (
-        <AdventureModal
-          event={state.pendingAdventure}
-          root={state.root}
-          onSelect={(idx) => actions.resolveAdventure(idx)}
-        />
+<AdventureModal
+                  event={state.pendingAdventure}
+                  stones={state.stones}
+          onSelect={(answerIndex, wager) => actions.resolveAdventure(answerIndex, wager)}
+          auraStyle={rootAuraStyle(state.root)}
+          />
       )}
 
       {showOnboarding && (
@@ -517,7 +600,7 @@ function Game() {
             <p className="mt-3 font-serif text-lg leading-relaxed">
               Chúc mừng Đạo hữu <span className="font-semibold text-primary">{state.name}</span>!
               Thiên địa cảm ứng, khai mở ra{" "}
-              <span className="font-semibold text-primary">{rootTitle(resultRoot)}</span>!
+              <span className={cn("inline-flex rounded-md px-2 py-1 font-semibold", spiritRootBadgeClass(resultRoot))}>{rootTitle(resultRoot)}</span>!
             </p>
             <button
               onClick={() => setResultRoot(null)}
@@ -586,7 +669,7 @@ function OnboardingModal({
         <div className="mt-6 space-y-4">
           <div>
             <label htmlFor="ob-name" className="text-xs uppercase tracking-widest text-muted-foreground">
-              Đại danh
+              Đạo Hiệu
             </label>
             <input
               id="ob-name"
@@ -650,19 +733,27 @@ function OnboardingModal({
   );
 }
 
-function rootPanelStyle(root: SpiritRoot | null): CSSProperties | undefined {
+function rootAuraStyle(root: SpiritRoot | null): CSSProperties | undefined {
   if (!root) return undefined;
-  const el = ELEMENT_INFO[root.element];
-  const grade = GRADE_INFO[root.grade];
-  const alpha = Math.round(grade.opacity * 255)
-    .toString(16)
-    .padStart(2, "0");
+  const aura = {
+    ha: { width: "1px", glow: "5px" },
+    trung: { width: "2px", glow: "12px" },
+    thuong: { width: "2.5px", glow: "16px" },
+    cuc: { width: "3px", glow: "22px" },
+  }[root.grade];
+  const color = ELEMENT_INFO[root.element].hex;
   return {
-    backgroundColor: `${el.hex}${alpha}`,
-    ...(grade.glow
-      ? { boxShadow: `0 0 24px 4px ${el.hex}, 0 0 6px 1px ${el.hex}`, borderColor: el.hex }
-      : {}),
-  };
+    borderColor: color,
+    borderWidth: aura.width,
+    boxShadow: `0 0 ${aura.glow} ${color}99, inset 0 0 10px ${color}22`,
+    "--root-aura-color": color,
+    ...(root.grade === "cuc" ? { animation: "root-aura-pulse 2.4s ease-in-out infinite" } : {}),
+  } as CSSProperties;
+}
+
+function rootPanelStyle(_root: SpiritRoot | null): CSSProperties | undefined {
+  if (!_root) return undefined;
+  return { backgroundColor: "#000000" };
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
@@ -678,7 +769,7 @@ function LogRow({ text, kind }: { text: string; kind: "info" | "good" | "bad" | 
   return (
     <p
       className={cn(
-        "rounded-md border-l-2 bg-background/40 px-3 py-2 text-sm",
+        "rounded-md border-l-2 bg-background/40 px-3 py-2 text-sm whitespace-pre-wrap break-words",
         kind === "epic" && "border-primary text-primary",
         kind === "good" && "border-jade text-foreground",
         kind === "bad" && "border-destructive text-destructive",

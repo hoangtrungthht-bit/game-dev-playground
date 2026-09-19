@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ARTIFACTS,
   GameState,
-  HERBS,
   HerbId,
   LogEntry,
   MANUALS,
@@ -21,7 +20,9 @@ import {
   rollEncounter,
   stageIndex,
 } from "@/lib/cultivation";
-import { rollModalEvent, type ModalEventData, type AdventureReward } from "@/utils/adventureLogic";
+import { createQuizEvent, type AdventureReward } from "@/utils/adventureLogic";
+import { generateDestinySeed } from "@/lib/destinySeed";
+import { TEXT_STREAM_EVENTS } from "@/data/textStreamEvents";
 
 export type GameNoticeKind = "minor" | "major" | "alchemy" | "gain" | "loss";
 export interface GameNotice {
@@ -29,9 +30,35 @@ export interface GameNotice {
   text: string;
   kind: GameNoticeKind;
   sound?: "breakthrough" | "alchemy" | "resource";
+  breakthrough?:
+    | { type: "minor"; realmTitle: string; qiRateGain: number }
+    | { type: "major"; name: string; realmTitle: string; qiRateGain: number; lifespanGain: number };
 }
 
 let logId = 100;
+
+function hashName(name: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < name.length; i++) {
+    h ^= name.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0) % 1_000_000;
+}
+
+function rollStoneDelta(current: number, minPct: number, maxPct: number, sign: 1 | -1): { amount: number; pct: number } {
+  const pct = minPct + Math.random() * (maxPct - minPct);
+  const amount = Math.max(5, Math.round(current * pct));
+  return { amount: sign * amount, pct: Math.round(pct * 100) };
+}
+
+function stoneLog(delta: number, pct: number): string {
+  return `[${delta >= 0 ? "+" : "-"} ${Math.abs(delta)} Linh Thạch (${delta >= 0 ? "+" : "-"}${Math.abs(pct)}%)]`;
+}
+
+function replaceStoneLog(text: string, delta: number, pct: number): string {
+  return `${text.replace(/\[[+-]\s*\d+\s+Linh Thạch(?:\s*\([^\]]+\))?\]/g, "").trim()} ${stoneLog(delta, pct)}`;
+}
 
 function pushLog(log: LogEntry[], text: string, kind: LogEntry["kind"]): LogEntry[] {
   return [{ id: ++logId, text, kind, time: Date.now() }, ...log].slice(0, 120);
@@ -42,7 +69,11 @@ export function useCultivation() {
   const [loaded, setLoaded] = useState(false);
   const [now, setNow] = useState(0);
   const [flash, setFlash] = useState<GameNotice | null>(null);
+  // Đoạn Thiên Mệnh vừa được khai mở (index 0-8) để chạy hiệu ứng trên Đăng Tiên Lộ.
+  const [seedReveal, setSeedReveal] = useState<number | null>(null);
   const lastTick = useRef(0);
+  // Lưu cả ID và nội dung của 30 sự kiện text gần nhất để chống lặp tuyệt đối.
+  const recentEvents = useRef<Array<{ id: string; message: string }>>([]);
 
   // Nạp dữ liệu đã lưu (chỉ chạy trên trình duyệt)
   useEffect(() => {
@@ -51,6 +82,16 @@ export function useCultivation() {
       if (raw) {
         const saved = { ...newGame(), ...(JSON.parse(raw) as GameState) };
         const t = Date.now();
+        // Nhân vật cũ chưa có Thiên Mệnh Đạo Cốt: sinh bù một lần, xác định theo hồ sơ.
+        if (saved.root && !saved.destinySeed) {
+          if (!saved.createdAt) saved.createdAt = saved.lastSeen || t;
+          saved.destinySeed = generateDestinySeed(
+            String(Math.abs(hashName(saved.name))).slice(0, 6),
+            saved.createdAt,
+            saved.root,
+            saved.gender,
+          );
+        }
         const away = Math.min(8 * 3600, Math.max(0, (t - (saved.lastSeen || t)) / 1000));
         if (away > 60) {
           const gain = qiRate({ ...saved, buffUntil: 0 }, t) * away * 0.5;
@@ -135,6 +176,8 @@ export function useCultivation() {
     setFlash({ id: ++logId, text, kind, ...(sound ? { sound } : {}) });
   }, []);
 
+  const dismissNotice = useCallback(() => setFlash(null), []);
+
   const meditate = useCallback(() => {
     setState((s) => ({ ...s, qi: s.qi + qiRate(s, Date.now()) * 1.5 + 2 }));
   }, []);
@@ -164,7 +207,29 @@ export function useCultivation() {
         const text = major
           ? `Thiên kiếp giáng lâm! Ngươi cắn răng chịu đủ chín đạo lôi đình, đột phá tới ${title}!`
           : `Kinh mạch thông suốt, ngươi tiến vào ${title}.`;
-        announce(text, major ? "major" : "minor", "breakthrough");
+        const previousRate = qiRate(s, Date.now());
+        const nextState = { ...s, realm, level };
+        setFlash({
+          id: ++logId,
+          text,
+          kind: major ? "major" : "minor",
+          sound: "breakthrough",
+          breakthrough: major
+            ? {
+                type: "major",
+                name: s.name,
+                realmTitle: title,
+                qiRateGain: Math.max(0, qiRate(nextState, Date.now()) - previousRate),
+                lifespanGain: 10 + stageIndex(nextState) * 3,
+              }
+            : {
+                type: "minor",
+                realmTitle: title,
+                qiRateGain: Math.max(0, qiRate(nextState, Date.now()) - previousRate),
+              },
+        });
+        // Đột phá đại cảnh giới: khai mở đoạn Thiên Mệnh tương ứng trên Đăng Tiên Lộ.
+        if (realm > s.realm) setSeedReveal(realm);
         return {
           ...s,
           realm,
@@ -244,10 +309,13 @@ export function useCultivation() {
     s: GameState,
     reward: AdventureReward,
     stage: number,
-  ): { herbs: Record<HerbId, number>; artifacts: string[]; stones: number; qi: number; artifactText: string } => {
+  ): { herbs: Record<HerbId, number>; pills: Record<PillId, number>; artifacts: string[]; stones: number; qi: number; artifactText: string } => {
     const herbs = reward.herbId
       ? { ...s.herbs, [reward.herbId]: s.herbs[reward.herbId as HerbId] + (reward.herbQty ?? 1) }
       : s.herbs;
+    const pills = reward.pillId
+      ? { ...s.pills, [reward.pillId]: s.pills[reward.pillId] + (reward.pillQty ?? 1) }
+      : s.pills;
     let artifacts = s.artifacts;
     let artifactText = "";
     if (reward.artifact) {
@@ -264,6 +332,7 @@ export function useCultivation() {
     }
     return {
       herbs,
+      pills,
       artifacts,
       stones: reward.stones ? Math.max(0, s.stones + reward.stones) : s.stones,
       qi: reward.qiPct ? Math.max(0, s.qi + qiNeeded(s) * reward.qiPct) : s.qi,
@@ -274,93 +343,123 @@ export function useCultivation() {
   const explore = useCallback(() => {
     setState((s) => {
       if (Date.now() < s.exploringUntil) return s;
-      // 5% kích hoạt Kỳ Ngộ modal
-      if (Math.random() < 0.05) {
-        const event = rollModalEvent(Math.random);
+  // Phân bổ encounter: 10% Kỳ Duyên, 1% Khảo Tâm Ma (chỉ xuất hiện tượng trưng), 89% sự kiện thường.
+  const eventRoll = Math.random();
+  if (eventRoll < 0.1) {
+    const e = rollEncounter(stageIndex(s), Math.random);
+    const epic = e.kind === "epic" ? e : rollEncounter(stageIndex(s), () => 0);
+    const herbs = { ...s.herbs };
+    if (epic.herb && epic.herbQty) herbs[epic.herb] += epic.herbQty;
+    const epicStone = epic.stones
+      ? rollStoneDelta(s.stones, 0.2, 0.4, epic.stones > 0 ? 1 : -1)
+      : { amount: 0, pct: 0 };
+    const epicText = epicStone.amount
+      ? replaceStoneLog(`Kỳ Duyên giáng thế: ${epic.text}`, epicStone.amount, epicStone.pct)
+      : `Kỳ Duyên giáng thế: ${epic.text}`;
+    return {
+      ...s,
+      herbs,
+      stones: Math.max(0, s.stones + epicStone.amount),
+      qi: Math.max(0, s.qi + qiNeeded(s) * (epic.qiPct ?? 0)),
+      exploringUntil: Date.now() + 6000,
+      log: pushLog(s.log, epicText, "epic"),
+    };
+  }
+  if (eventRoll < 0.11) {
+    const event = createQuizEvent(stageIndex(s), realmTitle(s));
         return {
           ...s,
           pendingAdventure: event,
           exploringUntil: Date.now() + 6000,
-          log: pushLog(s.log, `Kỳ ngộ hiện ra: ${event.title}!`, "epic"),
+          log: pushLog(s.log, `Tâm cảnh mở ra: ${event.title}!`, "epic"),
         };
       }
 
-      // Sự kiện thường (95%): danh sách sự kiện gốc của game
-      const e = rollEncounter(stageIndex(s), Math.random);
-      const herbs = { ...s.herbs };
-      if (e.herb && e.herbQty) herbs[e.herb] += e.herbQty;
-      let artifacts = s.artifacts;
-      let text = e.text;
-      if (e.artifact) {
-        const pool = ARTIFACTS.filter(
-          (a) => !s.artifacts.includes(a.id) && a.mult <= 0.4 + stageIndex(s) * 0.12,
-        );
-        const got = pool[Math.floor(Math.random() * pool.length)];
-        if (got) {
-          artifacts = [...artifacts, got.id];
-          text += ` Ngươi nhận được ${got.name} (${got.rarity})!`;
-        } else {
-          text += " Tiếc thay bên trong chỉ còn lại bụi trần.";
-        }
-      }
-      const herbName = e.herb ? HERBS.find((h) => h.id === e.herb)!.name : "";
-      if (e.herb && e.herbQty) text += ` (+${e.herbQty} ${herbName})`;
-      const isLargeCultivationChange = Math.abs(e.qiPct ?? 0) >= 0.15;
-      if (isLargeCultivationChange) {
+      // Luồng text stream dùng pool 60% trung lập / 40% có biến động tài nguyên.
+      // Loại bỏ theo cả ID và nội dung toàn bộ 30 sự kiện gần nhất trước khi random.
+      const availableEvents = TEXT_STREAM_EVENTS.filter(
+        (event) =>
+          !recentEvents.current.some(
+            (recent) => recent.id === event.id || recent.message === event.message,
+          ),
+      );
+      // Pool có đủ sự kiện để luôn duy trì cooldown 30 lượt; không fallback về
+      // danh sách đầy đủ vì fallback sẽ phá vỡ quy tắc chống lặp.
+      if (availableEvents.length === 0) return s;
+      const streamEvent = availableEvents[Math.floor(Math.random() * availableEvents.length)]!;
+      recentEvents.current = [
+        { id: streamEvent.id, message: streamEvent.message },
+        ...recentEvents.current.filter(
+          (recent) => recent.id !== streamEvent.id && recent.message !== streamEvent.message,
+        ),
+      ].slice(0, 30);
+  const isNeutral = streamEvent.type === "info";
+  const text = streamEvent.message;
+      const kind = isNeutral
+        ? "info"
+        : streamEvent.type === "reward"
+          ? "good"
+          : "bad";
+      const stones = streamEvent.baseLinhThach;
+      const qiDelta = streamEvent.baseLinhKhi / 100;
+      const herbDelta = {
+        linhthao: streamEvent.linhThao,
+        huyetchi: streamEvent.huyetChi,
+        bangnien: streamEvent.bangLien,
+        longdam: streamEvent.longDamThao,
+      };
+
+      if (!isNeutral) {
         announce(
-          e.qiPct && e.qiPct > 0
-            ? `Kỳ ngộ bùng nổ tu vi! ${text}`
-            : `Tu vi tổn thất! ${text}`,
-          e.qiPct && e.qiPct > 0 ? "gain" : "loss",
-          e.qiPct && e.qiPct > 0 ? "resource" : undefined,
+          text,
+          kind === "good" ? "gain" : "loss",
+          "resource",
         );
-      } else if ((e.stones ?? 0) > 0 || (e.herbQty ?? 0) > 0 || e.artifact) {
-        setFlash({ id: ++logId, text, kind: "gain", sound: "resource" });
       }
+
       return {
         ...s,
-        herbs,
-        artifacts,
-        stones: Math.max(0, s.stones + (e.stones ?? 0)),
-        qi: Math.max(0, s.qi + qiNeeded(s) * (e.qiPct ?? 0)),
+        stones: Math.max(0, s.stones + stones),
+        herbs: {
+          ...s.herbs,
+          linhthao: Math.max(0, s.herbs.linhthao + (herbDelta.linhthao ?? 0)),
+          huyetchi: Math.max(0, s.herbs.huyetchi + (herbDelta.huyetchi ?? 0)),
+          bangnien: Math.max(0, s.herbs.bangnien + (herbDelta.bangnien ?? 0)),
+          longdam: Math.max(0, s.herbs.longdam + (herbDelta.longdam ?? 0)),
+        },
+        qi: Math.max(0, s.qi + qiNeeded(s) * qiDelta),
         exploringUntil: Date.now() + 6000,
-        log: pushLog(s.log, text, e.kind),
+        log: pushLog(s.log, text, kind),
       };
     });
   }, [announce]);
 
-  const resolveAdventure = useCallback((optionIndex: 1 | 2) => {
+  const resolveAdventure = useCallback((answerIndex: number, wager: boolean) => {
     setState((s) => {
-      if (!s.pendingAdventure) return s;
       const event = s.pendingAdventure;
-      const option = optionIndex === 1 ? event.option1 : event.option2;
-      const stage = stageIndex(s);
-      const meetsReq = option.reqElement ? s.root?.element === option.reqElement : true;
-      const win = meetsReq && Math.random() < option.winRate;
-      const reward = applyAdventureRewards(s, win ? option.rewards : option.penalties, stage);
-
-      const herbName =
-        win && option.rewards.herbId
-          ? HERBS.find((h) => h.id === option.rewards.herbId)!.name
-          : "";
-      let text = win ? option.successText : option.failText;
-      if (win && option.rewards.herbQty && herbName) text += ` (+${option.rewards.herbQty} ${herbName})`;
-      if (reward.artifactText) text += reward.artifactText;
-
-      announce(
-        `${event.title}: ${text}`,
-        win ? "gain" : "loss",
-        win ? "resource" : undefined,
-      );
-
+      if (!event) return s;
+      const correct = answerIndex === event.correctIndex;
+      const quizStone = correct
+        ? rollStoneDelta(s.stones, wager ? 0.3 : 0.15, wager ? 0.3 : 0.15, 1)
+        : wager
+          ? { amount: -Math.max(5, Math.round(s.stones * 0.15)), pct: 15 }
+          : { amount: 0, pct: 0 };
+      const rewardQi = correct ? qiNeeded(s) * event.baseQiPct : 0;
+      const nextStones = Math.max(0, s.stones + quizStone.amount);
+      const text = correct
+        ? wager
+          ? `${event.title}: Chính xác! Tâm cảnh vững như bàn thạch, ngươi thắng lớn! ${stoneLog(quizStone.amount, quizStone.pct)} [+ ${Math.round(event.baseQiPct * 100)}% tu vi]`
+          : `${event.title}: Chính xác! Ngươi giữ vững đạo tâm và nhận được phần thưởng. ${stoneLog(quizStone.amount, quizStone.pct)} [+ ${Math.round(event.baseQiPct * 100)}% tu vi]`
+        : wager
+          ? `${event.title}: Sai rồi! Tâm ma quấy phá, cược thất bại. ${stoneLog(quizStone.amount, quizStone.pct)}`
+          : `${event.title}: Sai rồi! Tâm cảnh dao động, ngươi không nhận được phần thưởng.`;
+      announce(text, correct ? "gain" : "loss", correct ? "resource" : undefined);
       return {
         ...s,
         pendingAdventure: null,
-        herbs: reward.herbs,
-        artifacts: reward.artifacts,
-        stones: reward.stones,
-        qi: reward.qi,
-        log: pushLog(s.log, text, win ? "good" : "bad"),
+        stones: nextStones,
+        qi: s.qi + rewardQi,
+        log: pushLog(s.log, text, correct ? "good" : "bad"),
       };
     });
   }, [announce]);
@@ -373,19 +472,25 @@ export function useCultivation() {
     setState((s) => ({ ...s, name: name.slice(0, 24) || "Đạo Hữu Vô Danh" }));
   }, []);
 
-  const onboard = useCallback((name: string, gender: "nam" | "nu", root: SpiritRoot) => {
+  const onboard = useCallback(
+    (name: string, gender: "nam" | "nu", root: SpiritRoot, digits = "") => {
+    const createdAt = Date.now();
     setState((s) => ({
       ...s,
       name: name.slice(0, 24) || "Đạo Hữu Vô Danh",
       gender,
       root,
+      createdAt,
+      destinySeed: generateDestinySeed(digits, createdAt, root, gender),
       log: pushLog(
         s.log,
         `Thiên địa cảm ứng, ${name} khai mở ${rootTitle(root)}, chính thức bước lên đạo đồ.`,
         "epic",
       ),
     }));
-  }, []);
+    },
+    [],
+  );
 
   const learnManual = useCallback((id: string) => {
     setState((s) => {
@@ -407,6 +512,7 @@ export function useCultivation() {
 
   const reset = useCallback(() => {
     setState(newGame());
+    setSeedReveal(null);
     try {
       localStorage.removeItem(SAVE_KEY);
     } catch {
@@ -414,11 +520,14 @@ export function useCultivation() {
     }
   }, []);
 
+  const dismissSeedReveal = useCallback(() => setSeedReveal(null), []);
+
   return {
     state,
     now,
     loaded,
     flash,
-    actions: { meditate, breakthrough, brew, usePill, explore, equip, rename, reset, onboard, learnManual, equipManual, resolveAdventure },
+    seedReveal,
+    actions: { meditate, breakthrough, brew, usePill, explore, equip, rename, reset, onboard, learnManual, equipManual, resolveAdventure, dismissNotice, dismissSeedReveal },
   };
 }

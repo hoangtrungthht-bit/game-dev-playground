@@ -48,10 +48,19 @@ export function useGameAudio() {
 
   const getBgm = useCallback(() => {
     if (!bgmRef.current) {
-      const audio = new Audio(BGM_URL);
+      const audio = new Audio();
       audio.loop = true;
       audio.volume = 0.2;
-      audio.preload = "auto";
+      audio.preload = "none";
+      audio.addEventListener("error", (event) => {
+        // A missing/blocked optional soundtrack must not surface as a global
+        // runtime error or interrupt the game; gameplay audio remains available.
+        event.preventDefault();
+        audio.removeAttribute("src");
+        audio.load();
+        bgmRef.current = null;
+      }, { once: true });
+      audio.src = BGM_URL;
       bgmRef.current = audio;
     }
     return bgmRef.current;

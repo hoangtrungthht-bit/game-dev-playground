@@ -195,6 +195,15 @@
   }
 }
 
+@keyframes root-aura-pulse {
+  0%, 100% {
+    box-shadow: 0 0 16px color-mix(in srgb, var(--root-aura-color) 60%, transparent), inset 0 0 10px color-mix(in srgb, var(--root-aura-color) 13%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 30px var(--root-aura-color), 0 0 44px color-mix(in srgb, var(--root-aura-color) 40%, transparent), inset 0 0 18px color-mix(in srgb, var(--root-aura-color) 27%, transparent);
+  }
+}
+
 @keyframes realm-aura {
   0%, 100% {
     box-shadow: 0 0 18px oklch(0.82 0.13 85 / 0.35);
@@ -208,13 +217,48 @@
   animation: event-toast-in 220ms ease-out both;
 }
 
+.minor-breakthrough-toast {
+  box-shadow: 0 0 24px rgb(245 158 11 / 0.28), inset 0 0 22px rgb(245 158 11 / 0.06), 0 18px 45px rgb(0 0 0 / 0.55);
+}
+
+.minor-breakthrough-progress {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 3px;
+  transform-origin: left;
+  background: linear-gradient(90deg, #f59e0b, #fde68a);
+  box-shadow: 0 0 10px rgb(245 158 11 / 0.9);
+  animation: minor-breakthrough-countdown 5s linear forwards;
+}
+
+@keyframes minor-breakthrough-countdown {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
 .event-toast-major {
   animation: event-toast-in 260ms ease-out both, realm-aura 1.15s ease-in-out infinite;
 }
 
+.breakthrough-modal {
+  animation: realm-aura 1.35s ease-in-out infinite;
+}
+
+.breakthrough-runes {
+  color: oklch(0.82 0.13 85 / 0.38);
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  line-height: 2.1;
+  text-align: center;
+  text-shadow: 0 0 12px oklch(0.82 0.13 85 / 0.75);
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .breakthrough-modal,
   .event-toast,
-  .event-toast-major {
-    animation: none;
+  .event-toast-major,
+  .root-aura {
+    animation: none !important;
   }
 }
