@@ -563,7 +563,7 @@ function Game() {
         <OnboardingModal
           onConfirm={(name, gender, digits) => {
             const root = hashSpiritRoot(digits);
-            actions.onboard(name, gender, root);
+            actions.onboard(name, gender, root, digits);
             setResultRoot(root);
           }}
         />
