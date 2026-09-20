@@ -150,6 +150,7 @@ function Game() {
           <AscensionRoad
             seed={state.destinySeed}
             realm={state.realm}
+            realmFrac={realmFrac}
             revealIndex={seedReveal}
             onRevealDone={actions.dismissSeedReveal}
           />
