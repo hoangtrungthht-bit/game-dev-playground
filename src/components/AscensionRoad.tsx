@@ -54,9 +54,17 @@ export function AscensionRoad({ seed, realm, revealIndex, onRevealDone }: Props)
             const isAnimating = animating === i;
             const buff = isUnlocked && segments[i] ? segmentBuff(segments[i]!) : null;
 
-            // Mốc chưa đạt: hoàn toàn trống — để lộ nền đen tuyền của khung
+            // Mốc chưa đạt: chấm tròn chìm, tối màu, không phát sáng
             if (!isUnlocked) {
-              return <div key={r.name} className="relative z-10 flex-1" aria-hidden="true" />;
+              return (
+                <div key={r.name} className="relative z-10 flex flex-1 flex-col items-center gap-1.5">
+                  <span className="h-[14px]" aria-hidden="true" />
+                  <span
+                    className="block size-3.5 rounded-full bg-foreground/15"
+                    aria-hidden="true"
+                  />
+                </div>
+              );
             }
 
             return (
@@ -65,8 +73,8 @@ export function AscensionRoad({ seed, realm, revealIndex, onRevealDone }: Props)
                 className="relative z-10 flex flex-1 flex-col items-center gap-1.5"
                 title={
                   buff
-                    ? `${r.name} · Đoạn ${i + 1}: ${segment} — +${Math.round(buff.qiBonus * 100)}% linh khí, +${(buff.luckBonus * 100).toFixed(1)}% đột phá`
-                    : `${r.name} — chưa khai mở`
+                    ? `Đoạn ${i + 1}: ${segment} — +${Math.round(buff.qiBonus * 100)}% linh khí, +${(buff.luckBonus * 100).toFixed(1)}% đột phá`
+                    : undefined
                 }
               >
                 <span
@@ -98,10 +106,6 @@ export function AscensionRoad({ seed, realm, revealIndex, onRevealDone }: Props)
                       isAnimating && "ascension-node-burst",
                     )}
                   />
-                </span>
-
-                <span className="whitespace-nowrap text-[10px] leading-tight text-foreground/80">
-                  {r.name}
                 </span>
               </div>
             );
