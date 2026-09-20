@@ -112,6 +112,11 @@ function Game() {
   const chance = breakthroughChance(state);
   const major = isMajor(state);
   const stage = stageIndex(state);
+  // Tiến trình trong đại cảnh giới hiện tại: các tầng đã qua + % linh khí tầng hiện tại
+  const realmFrac = Math.min(
+    1,
+    ((state.level - 1) + pct / 100) / REALMS[state.realm]!.levels,
+  );
 
   useEffect(() => {
     if (flash?.sound) audio.playSfx(flash.sound);
