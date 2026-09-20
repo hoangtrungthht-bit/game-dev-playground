@@ -54,6 +54,11 @@ export function AscensionRoad({ seed, realm, revealIndex, onRevealDone }: Props)
             const isAnimating = animating === i;
             const buff = isUnlocked && segments[i] ? segmentBuff(segments[i]!) : null;
 
+            // Mốc chưa đạt: hoàn toàn trống — để lộ nền đen tuyền của khung
+            if (!isUnlocked) {
+              return <div key={r.name} className="relative z-10 flex-1" aria-hidden="true" />;
+            }
+
             return (
               <div
                 key={r.name}
@@ -67,19 +72,15 @@ export function AscensionRoad({ seed, realm, revealIndex, onRevealDone }: Props)
                 <span
                   className={cn(
                     "font-mono text-[11px] font-bold tabular-nums transition",
-                    isUnlocked ? "text-primary" : "text-muted-foreground/70",
+                    "text-primary",
                     isAnimating && "seed-segment-reveal",
                   )}
-                  style={
-                    isUnlocked
-                      ? {
-                          textShadow:
-                            "0 0 6px rgba(245,158,11,0.9), 0 0 16px rgba(245,158,11,0.5)",
-                        }
-                      : undefined
-                  }
+                  style={{
+                    textShadow:
+                      "0 0 6px rgba(245,158,11,0.9), 0 0 16px rgba(245,158,11,0.5)",
+                  }}
                 >
-                  {isUnlocked ? segment : "???"}
+                  {segment}
                 </span>
 
                 <span className="relative grid place-items-center">
@@ -92,21 +93,14 @@ export function AscensionRoad({ seed, realm, revealIndex, onRevealDone }: Props)
                   <span
                     className={cn(
                       "block rounded-full border-2 transition",
-                      isUnlocked
-                        ? "size-3.5 border-primary bg-primary shadow-[0_0_12px_rgba(245,158,11,0.75)]"
-                        : "size-3 border-border bg-secondary",
-                      isNow && isUnlocked && "size-4 ascension-node-pulse",
+                      "size-3.5 border-primary bg-primary shadow-[0_0_12px_rgba(245,158,11,0.75)]",
+                      isNow && "size-4 ascension-node-pulse",
                       isAnimating && "ascension-node-burst",
                     )}
                   />
                 </span>
 
-                <span
-                  className={cn(
-                    "whitespace-nowrap text-[10px] leading-tight",
-                    isUnlocked ? "text-foreground/80" : "text-muted-foreground/60",
-                  )}
-                >
+                <span className="whitespace-nowrap text-[10px] leading-tight text-foreground/80">
                   {r.name}
                 </span>
               </div>
