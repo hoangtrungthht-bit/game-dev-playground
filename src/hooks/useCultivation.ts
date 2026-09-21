@@ -418,8 +418,26 @@ export function useCultivation() {
         );
       }
 
+      // Rơi ngẫu nhiên pháp bảo khi phiêu lưu (8%), giới hạn theo cảnh giới hiện tại.
+      let artifacts = s.artifacts;
+      let log = pushLog(s.log, text, kind);
+      if (Math.random() < 0.08) {
+        const stage = stageIndex(s);
+        const pool = ARTIFACTS.filter(
+          (a) => !s.artifacts.includes(a.id) && a.mult <= 0.3 + stage * 0.14,
+        );
+        const got = pool[Math.floor(Math.random() * pool.length)];
+        if (got) {
+          artifacts = [...s.artifacts, got.id];
+          const dropText = `Ngươi tìm được pháp bảo ${got.name} (${got.rarity})!`;
+          log = pushLog(log, dropText, "epic");
+          announce(dropText, "gain", "resource");
+        }
+      }
+
       return {
         ...s,
+        artifacts,
         stones: Math.max(0, s.stones + stones),
         herbs: {
           ...s.herbs,
@@ -430,7 +448,7 @@ export function useCultivation() {
         },
         qi: Math.max(0, s.qi + qiNeeded(s) * qiDelta),
         exploringUntil: Date.now() + 6000,
-        log: pushLog(s.log, text, kind),
+        log,
       };
     });
   }, [announce]);
