@@ -228,8 +228,9 @@ export function useCultivation() {
                 qiRateGain: Math.max(0, qiRate(nextState, Date.now()) - previousRate),
               },
         });
-        // Đột phá đại cảnh giới: khai mở đoạn Thiên Mệnh tương ứng trên Đăng Tiên Lộ.
-        if (realm > s.realm) setSeedReveal(realm);
+        // Hoàn thành đại cảnh giới hiện tại mới khai mở đoạn Thiên Mệnh của mốc đó.
+        // Ví dụ: Luyện Khí → Trúc Cơ sẽ mở đoạn 0, không mở sẵn đoạn Trúc Cơ.
+        if (realm > s.realm) setSeedReveal(s.realm);
         return {
           ...s,
           realm,

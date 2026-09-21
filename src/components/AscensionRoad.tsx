@@ -29,8 +29,14 @@ export function AscensionRoad({ seed, realm, realmFrac, revealIndex, onRevealDon
     return () => clearTimeout(t);
   }, [revealIndex, onRevealDone]);
 
-  // Thanh chạy: các mốc đã mở trọn + tiến trình % trong đại cảnh giới hiện tại
-  const fillFrac = Math.max(0, Math.min(1, (unlocked - 1 + realmFrac) / (SEGMENT_COUNT - 1)));
+  // Mỗi đại cảnh giới chiếm đúng 1 khoảng: mốc thứ i nằm ở (i+1)/9 chiều dài thanh.
+  // Luyện Khí chạy từ đầu thanh tới chấm đầu tiên, các cảnh giới sau chạy từ chấm
+  // trước sang chấm kế tiếp theo % tiến trình hiện tại.
+  const clampedFrac = Math.max(0, Math.min(1, realmFrac));
+  const fillFrac = Math.max(
+    0,
+    Math.min(1, (Math.min(realm, SEGMENT_COUNT - 1) + clampedFrac) / SEGMENT_COUNT),
+  );
 
   return (
     <div className="mt-5" aria-label="Đăng Tiên Lộ">
@@ -41,20 +47,20 @@ export function AscensionRoad({ seed, realm, realmFrac, revealIndex, onRevealDon
       </div>
 
       <div className="mt-2 -mx-1 overflow-x-auto pb-1">
-        <div className="relative min-w-[560px] px-3 pt-1">
-          {/* Thanh ngang nền */}
-          <div
-            className="absolute left-6 right-6 top-2 h-[3px] -translate-y-1/2 rounded-full bg-border"
-            aria-hidden="true"
-          />
-          {/* Thanh tiến trình chạy theo % trong đại cảnh giới hiện tại */}
-          <div
-            className="absolute left-6 top-2 h-[3px] -translate-y-1/2 rounded-full bg-gradient-to-r from-jade via-primary to-amber-200 shadow-[0_0_10px_rgba(245,158,11,0.75)] transition-[width] duration-700"
-            style={{ width: `calc((100% - 3rem) * ${fillFrac})` }}
-            aria-hidden="true"
-          />
+        <div className="relative min-w-[600px] px-8 pt-1">
+          <div className="relative h-10">
+            {/* Thanh ngang nền: kéo từ đầu thanh tới tâm chấm cuối cùng */}
+            <div
+              className="absolute left-0 right-0 top-2 h-[3px] -translate-y-1/2 rounded-full bg-border"
+              aria-hidden="true"
+            />
+            {/* Thanh tiến trình chạy theo % trong đại cảnh giới hiện tại */}
+            <div
+              className="absolute left-0 top-2 h-[3px] -translate-y-1/2 rounded-full bg-gradient-to-r from-jade via-primary to-amber-200 shadow-[0_0_10px_rgba(245,158,11,0.75)] transition-[width] duration-700"
+              style={{ width: `${fillFrac * 100}%` }}
+              aria-hidden="true"
+            />
 
-          <div className="relative flex items-start justify-between gap-1">
             {REALMS.slice(0, SEGMENT_COUNT).map((r, i) => {
               const isUnlocked = i < unlocked;
               const segment = segments[i] ?? "???";
@@ -65,7 +71,8 @@ export function AscensionRoad({ seed, realm, realmFrac, revealIndex, onRevealDon
               return (
                 <div
                   key={r.name}
-                  className="relative z-10 flex flex-1 flex-col items-center"
+                  className="absolute top-0 z-10 flex -translate-x-1/2 flex-col items-center"
+                  style={{ left: `${((i + 1) / SEGMENT_COUNT) * 100}%` }}
                   title={
                     buff
                       ? `Đoạn ${i + 1}: ${segment} — +${Math.round(buff.qiBonus * 100)}% linh khí, +${(buff.luckBonus * 100).toFixed(1)}% đột phá`
@@ -119,7 +126,7 @@ export function AscensionRoad({ seed, realm, realmFrac, revealIndex, onRevealDon
           {/* Nhãn % tiến trình trong đại cảnh giới hiện tại */}
           <div className="relative mt-1 flex justify-end pr-1">
             <span className="font-mono text-[10px] tabular-nums text-muted-foreground">
-              {Math.round(realmFrac * 100)}%
+              {Math.round(clampedFrac * 100)}%
             </span>
           </div>
         </div>

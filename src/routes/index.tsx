@@ -8,6 +8,8 @@ import {
   HERBS,
   HerbId,
   MANUALS,
+  manualsQiBonus,
+  manualsLuckBonus,
   PILLS,
   PillId,
   REALMS,
@@ -447,8 +449,12 @@ function Game() {
                 <div className="space-y-4">
                   <p className="font-serif text-lg">Bí tịch tàng kinh các</p>
                   <p className="text-sm text-muted-foreground">
-                    Lĩnh ngộ công pháp để tăng thụ động tốc độ tích lũy linh khí hoặc tỉ lệ đột
-                    phá. Chỉ có một công pháp được vận chuyển cùng lúc.
+                    Mọi công pháp đã lĩnh ngộ đều cộng dồn vĩnh viễn vào tốc độ linh khí và tỉ lệ
+                    đột phá. Ô vận chuyển chỉ quyết định bộ công pháp đang hiển thị khi điều tức.
+                  </p>
+                  <p className="text-xs text-jade">
+                    Tổng nội tại: +{Math.round(manualsQiBonus(state.manuals) * 100)}% tốc độ linh khí • +
+                    {Math.round(manualsLuckBonus(state.manuals) * 100)}% tỉ lệ đột phá
                   </p>
                   <div className="grid gap-3 md:grid-cols-2">
                     {MANUALS.map((m) => {
@@ -465,15 +471,19 @@ function Game() {
                           <div className="flex items-baseline justify-between gap-2">
                             <h3 className="font-serif text-base text-primary">{m.name}</h3>
                             <span className="shrink-0 text-xs text-muted-foreground">
-                              {owned ? (active ? "Đang vận chuyển" : "Đã lĩnh ngộ") : `${m.stones} linh thạch`}
+                              {owned ? (active ? "Đang vận chuyển" : "Đã lĩnh ngộ") : `${m.stones.toLocaleString("vi-VN")} linh thạch`}
                             </span>
                           </div>
+                          <p className="mt-1 text-[11px] uppercase tracking-wide text-muted-foreground">
+                            {m.tier}
+                          </p>
                           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{m.desc}</p>
                           <p className="mt-2 text-xs">
                             {m.qiMult > 0 && `+${Math.round(m.qiMult * 100)}% tốc độ linh khí`}
                             {m.qiMult > 0 && m.luck > 0 && " • "}
                             {m.luck > 0 && `+${Math.round(m.luck * 100)}% tỉ lệ đột phá`}
                           </p>
+
                           <button
                             onClick={() => (owned ? actions.equipManual(m.id) : actions.learnManual(m.id))}
                             disabled={!owned && state.stones < m.stones}

@@ -70,9 +70,12 @@ export function segmentBuff(segment: string): SegmentBuff {
   };
 }
 
-/** Số đoạn đã mở khóa: cảnh giới hiện tại (index) + 1. */
+/**
+ * Số đoạn đã mở khóa bằng số đại cảnh giới đã hoàn thành.
+ * Ở Luyện Khí (realm 0) chưa có đoạn nào; bước sang Trúc Cơ mới mở đoạn 1.
+ */
 export function unlockedSegmentCount(realm: number): number {
-  return Math.max(1, Math.min(SEGMENT_COUNT, realm + 1));
+  return Math.max(0, Math.min(SEGMENT_COUNT, Math.floor(realm)));
 }
 
 /** Tổng hệ số linh khí cộng thêm từ các đoạn đã mở khóa. */
