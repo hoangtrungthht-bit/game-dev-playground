@@ -82,22 +82,33 @@ export const PILLS: Pill[] = [
   },
 ];
 
+export type ArtifactTier =
+  | "Sơ cấp"
+  | "Trung cấp"
+  | "Cao cấp"
+  | "Trấn phái"
+  | "Tuyệt học"
+  | "Tối cao";
+
 export interface Artifact {
   id: string;
   name: string;
-  rarity: "Phàm khí" | "Linh khí" | "Bảo khí" | "Tiên khí";
+  rarity: ArtifactTier;
   mult: number;
   luck: number;
 }
 
 export const ARTIFACTS: Artifact[] = [
-  { id: "moc_kiem", name: "Đào Mộc Kiếm", rarity: "Phàm khí", mult: 0.15, luck: 0 },
-  { id: "tu_khi_bao", name: "Tụ Khí Bội", rarity: "Phàm khí", mult: 0.25, luck: 0.02 },
-  { id: "thanh_van_bao", name: "Thanh Vân Pháp Bào", rarity: "Linh khí", mult: 0.5, luck: 0.03 },
-  { id: "huyen_quy_giap", name: "Huyền Quy Giáp", rarity: "Linh khí", mult: 0.7, luck: 0.05 },
-  { id: "lac_hon_chung", name: "Lạc Hồn Chung", rarity: "Bảo khí", mult: 1.2, luck: 0.06 },
-  { id: "cuu_diep_lien", name: "Cửu Diệp Liên Đài", rarity: "Bảo khí", mult: 1.8, luck: 0.08 },
-  { id: "thai_hu_kinh", name: "Thái Hư Bảo Kính", rarity: "Tiên khí", mult: 3.0, luck: 0.12 },
+  { id: "tu_linh_ky", name: "Tụ Linh Kỳ", rarity: "Sơ cấp", mult: 0.15, luck: 0 },
+  { id: "ho_tam_kinh", name: "Hộ Tâm Kính", rarity: "Sơ cấp", mult: 0, luck: 0.03 },
+  { id: "thanh_quang_kiem", name: "Thanh Quang Kiếm", rarity: "Trung cấp", mult: 0.3, luck: 0.05 },
+  { id: "duoc_vuong_lo", name: "Dược Vương Lô", rarity: "Trung cấp", mult: 0.45, luck: 0 },
+  { id: "luong_nghi_ban", name: "Lưỡng Nghi Bàn", rarity: "Cao cấp", mult: 0.6, luck: 0.1 },
+  { id: "hao_thien_thap", name: "Hạo Thiên Tháp", rarity: "Cao cấp", mult: 0.8, luck: 0.12 },
+  { id: "van_hon_phien", name: "Vạn Hồn Phiên", rarity: "Trấn phái", mult: 1.1, luck: 0 },
+  { id: "hu_thien_dinh", name: "Hư Thiên Đỉnh", rarity: "Trấn phái", mult: 1.3, luck: 0.18 },
+  { id: "hon_nguyen_kim_dau", name: "Hỗn Nguyên Kim Đấu", rarity: "Tuyệt học", mult: 1.6, luck: 0.22 },
+  { id: "thong_thien_phu_do", name: "Thông Thiên Phù Đồ", rarity: "Tối cao", mult: 2.0, luck: 0.3 },
 ];
 
 // ===== Linh Căn (Ngũ Hành) =====
