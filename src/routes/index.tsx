@@ -212,11 +212,43 @@ function Game() {
               </p>
             </div>
 
-            <div className="mt-5 grid grid-cols-2 gap-2 text-center text-xs">
+            <div className="mt-5 grid grid-cols-3 gap-2 text-center text-xs">
               <Stat label="Tầng thứ" value={`${stage + 1}`} />
               <Stat label="Số lần đột phá" value={`${state.breakthroughs}`} />
-              <Stat label="Pháp bảo" value={artifactOf(state.equipped)?.name ?? "Chưa trang bị"} />
               <Stat label="Tỉ lệ đột phá" value={`${Math.round(chance * 100)}%`} />
+            </div>
+
+            {/* Ô trang bị pháp bảo duy nhất */}
+            <div className="mt-3 rounded-lg border border-primary/40 bg-background/40 p-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                    Ô pháp bảo
+                  </p>
+                  <p className="truncate font-serif text-primary">
+                    {artifactOf(state.equipped)?.name ?? "Chưa trang bị"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {artifactOf(state.equipped)
+                      ? `+${Math.round((artifactOf(state.equipped)?.mult ?? 0) * 100)}% tốc độ linh khí • +${Math.round((artifactOf(state.equipped)?.luck ?? 0) * 100)}% tỉ lệ đột phá`
+                      : "Đi phiêu lưu để tìm pháp bảo"}
+                  </p>
+                </div>
+                <select
+                  aria-label="Chọn pháp bảo trang bị"
+                  value={state.equipped ?? ""}
+                  onChange={(e) => actions.equipSlot(e.target.value || null)}
+                  disabled={state.artifacts.length === 0}
+                  className="max-w-[45%] rounded-md border border-border bg-secondary px-2 py-2 text-xs disabled:opacity-50"
+                >
+                  <option value="">Không trang bị</option>
+                  {ARTIFACTS.filter((a) => state.artifacts.includes(a.id)).map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.name} ({a.rarity})
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div className="mt-5 space-y-2">
