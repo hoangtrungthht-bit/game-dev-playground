@@ -147,61 +147,125 @@ export function rootTitle(root: SpiritRoot): string {
 }
 
 // ===== Công Pháp / Tâm pháp =====
+export type ManualTier = "Sơ cấp" | "Trung cấp" | "Cao cấp" | "Trấn phái" | "Tuyệt học" | "Tối cao";
+
 export interface Manual {
   id: string;
   name: string;
+  tier: ManualTier;
   desc: string;
   stones: number;
-  qiMult: number; // +% tốc độ tích lũy linh khí (thụ động khi trang bị)
-  luck: number; // + tỉ lệ đột phá
+  qiMult: number; // +% tốc độ tích lũy linh khí (cộng dồn vĩnh viễn khi đã lĩnh ngộ)
+  luck: number; // + tỉ lệ đột phá (cộng dồn vĩnh viễn khi đã lĩnh ngộ)
 }
 
 export const MANUALS: Manual[] = [
   {
     id: "thanh_moc_quyet",
     name: "Thanh Mộc Quyết",
+    tier: "Sơ cấp",
     desc: "Tâm pháp nhập môn, hô hấp theo nhịp sinh trưởng của cây cối.",
-    stones: 60,
+    stones: 100,
     qiMult: 0.15,
     luck: 0,
   },
   {
     id: "viem_duong_cong",
     name: "Viêm Dương Công",
+    tier: "Sơ cấp",
     desc: "Dẫn hỏa khí rèn kinh mạch, đột phá thêm phần chắc chắn.",
-    stones: 120,
+    stones: 250,
     qiMult: 0,
     luck: 0.03,
   },
   {
     id: "huyen_thuy_kinh",
     name: "Huyền Thủy Chân Kinh",
+    tier: "Trung cấp",
     desc: "Linh khí vận chuyển như dòng nước sâu, không ngừng nghỉ.",
-    stones: 220,
+    stones: 600,
     qiMult: 0.4,
     luck: 0,
   },
   {
     id: "cuu_chuyen_than",
     name: "Cửu Chuyển Kim Thân",
+    tier: "Trung cấp",
     desc: "Thân thể như kim cương, vững tâm khi nghịch chuyển thiên cơ.",
-    stones: 350,
-    qiMult: 0.1,
+    stones: 1200,
+    qiMult: 0.3,
     luck: 0.06,
   },
   {
     id: "ngu_hanh_kinh",
     name: "Thái Nhất Ngũ Hành Kinh",
+    tier: "Cao cấp",
     desc: "Bí tịch thượng cổ, ngũ hành sinh khắc tuần hoàn bất tận.",
-    stones: 800,
-    qiMult: 0.6,
+    stones: 2500,
+    qiMult: 0.5,
     luck: 0.08,
+  },
+  {
+    id: "bat_hoang_cuong_long",
+    name: "Bát Hoang Cuồng Long Quyết",
+    tier: "Cao cấp",
+    desc: "Cuồng long nộ khởi bát hoang, khí thế áp đảo thiên kiếp.",
+    stones: 4500,
+    qiMult: 0.35,
+    luck: 0.12,
+  },
+  {
+    id: "thai_hu_hoa_khi",
+    name: "Thái Hư Hóa Khí Thư",
+    tier: "Trấn phái",
+    desc: "Hư không hóa khí, linh khí đất trời tự quy về đan điền.",
+    stones: 7500,
+    qiMult: 0.7,
+    luck: 0,
+  },
+  {
+    id: "vo_luong_tinh_the",
+    name: "Vô Lượng Tịnh Thế Chân Kinh",
+    tier: "Trấn phái",
+    desc: "Đạo tâm vô lượng, tịnh hóa trần thế, tâm ma bất xâm.",
+    stones: 11000,
+    qiMult: 1.2,
+    luck: 0.2,
+  },
+  {
+    id: "hon_nguyen_dao_ton",
+    name: "Hỗn Nguyên Đạo Tôn Điển",
+    tier: "Tuyệt học",
+    desc: "Hỗn nguyên nhất khí, đạo tôn lâm thế, vạn pháp quy tông.",
+    stones: 16000,
+    qiMult: 1.3,
+    luck: 0.25,
+  },
+  {
+    id: "chuyen_luan_thanh_phap",
+    name: "Chuyển Luân Thánh Pháp",
+    tier: "Tối cao",
+    desc: "Luân hồi chuyển động, thánh pháp vô thượng, nghịch chuyển sinh tử.",
+    stones: 23000,
+    qiMult: 1.5,
+    luck: 0.3,
   },
 ];
 
 export function manualOf(id: string | null): Manual | undefined {
   return MANUALS.find((m) => m.id === id);
 }
+
+/** Tổng % tốc độ linh khí cộng dồn từ mọi công pháp đã lĩnh ngộ. */
+export function manualsQiBonus(manuals: string[]): number {
+  return manuals.reduce((sum, id) => sum + (manualOf(id)?.qiMult ?? 0), 0);
+}
+
+/** Tổng tỉ lệ đột phá cộng dồn từ mọi công pháp đã lĩnh ngộ. */
+export function manualsLuckBonus(manuals: string[]): number {
+  return manuals.reduce((sum, id) => sum + (manualOf(id)?.luck ?? 0), 0);
+}
+
 
 export interface LogEntry {
   id: number;
@@ -289,14 +353,28 @@ export function artifactOf(id: string | null): Artifact | undefined {
   return ARTIFACTS.find((a) => a.id === id);
 }
 
+// Hệ số hấp thu linh lực theo phẩm chất Linh Căn.
+// Hạ Phẩm là mốc chuẩn (1.0), mỗi cấp cao hơn +20% so với cấp liền trước.
+export const GRADE_QI_MULT: Record<GradeId, number> = {
+  ha: 1,
+  trung: 1.2,
+  thuong: 1.2 * 1.2,
+  cuc: 1.2 * 1.2 * 1.2,
+};
+
+export function rootQiMult(root: SpiritRoot | null): number {
+  return root ? GRADE_QI_MULT[root.grade] : 1;
+}
+
 export function qiRate(s: GameState, now: number): number {
   const stage = stageIndex(s);
   const base = 1 + stage * 0.9 + Math.pow(stage, 1.75) * 0.12;
   const art = 1 + (artifactOf(s.equipped)?.mult ?? 0);
-  const man = 1 + (manualOf(s.equippedManual)?.qiMult ?? 0);
+  const man = 1 + manualsQiBonus(s.manuals);
   const buff = now < s.buffUntil ? 2 : 1;
   const destiny = destinyQiMult(s.destinySeed, s.realm);
-  return base * art * man * buff * destiny;
+  const rootMult = rootQiMult(s.root);
+  return base * art * man * buff * destiny * rootMult;
 }
 
 export function isMajor(s: Pick<GameState, "realm" | "level">): boolean {
@@ -313,7 +391,7 @@ export function breakthroughChance(s: GameState): number {
   const major = isMajor(s);
   let c = (major ? 0.55 : 0.92) - stage * 0.012;
   c += artifactOf(s.equipped)?.luck ?? 0;
-  c += manualOf(s.equippedManual)?.luck ?? 0;
+  c += manualsLuckBonus(s.manuals);
   c += Math.min(0.2, s.failures * 0.05);
   c += destinyLuck(s.destinySeed, s.realm);
   if (s.pills.phacanh > 0) c += 0.25;
