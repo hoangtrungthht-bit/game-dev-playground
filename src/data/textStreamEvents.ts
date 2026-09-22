@@ -538,10 +538,10 @@ export const EVENTS = [
     linhKhi: 15,
   },
   {
-    text: "tiêu diệt một con Ma Dơi chuyên hút máu thú nuôi. [+ 20% tu vi] [+ 30 Linh Thạch]",
+    text: "tiêu diệt một con Ma Dơi chuyên hút máu thú nuôi, mang xác nó bán cho vị tán tu luyện thuốc thu được ít linh thạch. [+ 30 Linh Thạch]",
     type: "reward",
     linhThach: 30,
-    linhKhi: 20,
+    linhKhi: 0,
   },
   {
     text: "nhặt được mảnh bản đồ dẫn tới hang động tu tiên. [+ 25% tu vi] [+ 25 Linh Thạch]",
