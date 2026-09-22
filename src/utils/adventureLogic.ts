@@ -1,5 +1,6 @@
 import type { ElementId } from "@/lib/cultivation";
 import { ELEMENT_INFO } from "@/lib/cultivation";
+import { REALM_QUESTIONS_DATABASE, type RealmQuestionItem } from "@/data/realmQuestions";
 
 export interface AdventureReward {
   stones?: number;
@@ -45,114 +46,51 @@ export interface QuizEventData {
   realmName: string;
 }
 
-type QuizQuestion = { question: string; answers: readonly [string, string, string, string]; correctIndex: number; stage: number };
+const QUIZ_REALM_KEYS = [
+  "Luyện Khí Kỳ",
+  "Trúc Cơ Kỳ",
+  "Kim Đan Kỳ",
+  "Nguyên Anh Kỳ",
+  "Hóa Thần Kỳ",
+  "Luyện Hư Kỳ",
+  "Hợp Thể Kỳ",
+  "Đại Thừa Kỳ",
+  "Độ Kiếp Kỳ",
+] as const;
 
-const REALM_QUESTIONS: readonly (readonly [string, string])[] = [
-  ["Tâm ma xuất hiện khi nào trong quá trình tu hành?", "Khi đạo tâm xuất hiện vết nứt hoặc khi vượt kiếp"],
-  ["Luyện Khí kỳ tập trung chủ yếu vào điều gì?", "Dẫn khí nhập thể, gột rửa phàm căn"],
-  ["Khi gặp ảo ảnh đồng môn hãm hại lúc nhập định, nên xử trí ra sao?", "Nhắm mắt thu hút linh khí, dùng Đạo tâm đập tan ảo ảnh"],
-  ["Linh khí trong thiên hạ khởi nguồn từ đâu?", "Chuyển hóa từ Thiên Địa Bản Nguyên"],
-  ["Đứng trước tà tu dụ dỗ ban công pháp cấp tốc, ngươi chọn gì?", "Giữ vững Đạo tâm, từ bỏ lối tắt nguy hiểm"],
-  ["Đạo căn yếu kém muốn tiến xa cần dựa vào điều gì?", "Ý chí kiên định và cơ duyên"],
-  ["Tẩy Tủy Đan có tác dụng chính là gì?", "Gột rửa tạp chất trong cơ thể, cải thiện căn cốt"],
-  ["Linh Thạch Hạ Phẩm thường chứa loại năng lượng nào?", "Thiên địa linh khí sơ cấp"],
-  ["Tâm ma đầu tiên của tu sĩ thường phát sinh từ đâu?", "Hận thù phàm tục và nỗi sợ chết"],
-  ["Ý nghĩa thực sự của Bế Quan Tu Luyện là gì?", "Tập trung ngộ đạo và ngưng tụ linh lực"],
-  ["Đại đạo Trúc Cơ cốt ở điểm nào?", "Xây nền đạo cơ vững chắc cho hành trình tu tiên"],
-  ["Trúc Cơ Đan có vai trò quyết định gì?", "Hỗ trợ nén Khí thành Dịch, ngưng tụ Đạo Cơ"],
-  ["Hình dáng Đạo Cơ hoàn hảo nhất thường gọi là gì?", "Thiên Phẩm Đạo Cơ"],
-  ["Đạo Cơ xuất hiện vết nứt do đột phá thất bại nên làm gì?", "Dùng Ôn Dưỡng Đan tĩnh dưỡng và vá vết nứt"],
-  ["Tu sĩ Trúc Cơ làm được gì mà Luyện Khí không làm được?", "Ngự kiếm phi hành và thọ nguyên tăng lên"],
-  ["Khi gặp Thần Thức áp chế từ cao nhân, nên làm gì?", "Thu nhiễm thần thức, dùng ý chí chống đỡ"],
-  ["Linh lực ở Trúc Cơ kỳ tồn tại dưới dạng nào?", "Dạng Dịch thể"],
-  ["Chấp niệm lớn nhất cản trở Trúc Cơ thường là gì?", "Quyến luyến vinh hoa phú quý phàm tục"],
-  ["Tam Thanh Trúc Cơ yêu cầu điều gì?", "Tinh - Khí - Thần hợp nhất"],
-  ["Thọ nguyên trung bình của tu sĩ Trúc Cơ là bao nhiêu?", "200 - 300 năm"],
-  ["Nhất Lạp Kim Đan Hạ Lạc Đồ nghĩa là gì?", "Ngưng tụ Kim Đan, chính thức thoát khỏi kiếp phàm nhân"],
-  ["Phẩm cấp Kim Đan nào đại diện tu vi cao nhất?", "Nhất Phẩm Kim Đan hoặc Cửu Chuyển Kim Đan"],
-  ["Thiên Kiếp Kim Đan thường xuất hiện dưới hình thức nào?", "Lôi Kiếp"],
-  ["Tâm ma trong Lôi Kiếp Kim Đan gọi là gì?", "Tâm Ma Kiếp / Ảo Phong Ma"],
-  ["Đặc điểm linh lực tu sĩ Kim Đan là gì?", "Cô đọng thành Kim Đan rắn chắc trong Đan Điền"],
-  ["Kim Đan bị rạn nứt, nguy cơ lớn nhất là gì?", "Tu vi rơi rụng, Kim Đan vỡ nát tử vong"],
-  ["Bổ Kim Đan có tác dụng chính là gì?", "Vá lại nếp rạn nứt trên Kim Đan"],
-  ["Địa Mạch Kim Đan khác Thiên Mạch Kim Đan thế nào?", "Phẩm cấp và tiềm năng tiến cấp Nguyên Anh kém hơn"],
-  ["Thần Thức Kim Đan có thể quét xa đến đâu?", "Hàng chục đến hàng trăm dặm"],
-  ["Luyện Kim Đan yêu cầu điều gì khắt khe nhất?", "Đạo tâm kiên định chịu đựng Lôi Kiếp tôi luyện"],
-  ["Nguyên Anh Kỳ đánh dấu bước ngoặt sinh mệnh nào?", "Đập tan Kim Đan, hóa thành Nguyên Anh"],
-  ["Nguyên Anh có khả năng gì khi xác thịt bị hủy diệt?", "Xuất khiếu, tìm thân xác mới để Đoạt Xá"],
-  ["Đoạt Xá có hạn chế lớn nhất là gì?", "Chỉ có thể đoạt xá giới hạn lần và khó đạt đỉnh phong cũ"],
-  ["Tâm Ma Kiếp Nguyên Anh tấn công trực tiếp vào đâu?", "Thần Thức và Nguyên Hồn"],
-  ["Thiên Kiếp Nguyên Anh thường có bao nhiêu luồng lôi kiếp?", "Tam Thập Lục hoặc Tứ Cửu Trọng Lôi Kiếp"],
-  ["Nguyên Anh Phụ Thể dùng để làm gì?", "Tăng cường khả năng chiến đấu vượt cấp trong thời gian ngắn"],
-  ["Nguyên Anh Tử Khí xảy ra khi nào?", "Nguyên Anh bị tà khí xâm nhập biến thành màu đen"],
-  ["Tu sĩ Nguyên Anh có thọ nguyên khoảng bao nhiêu?", "1.000 - 2.000 năm"],
-  ["Tịnh Hóa Nguyên Anh bằng nguyên liệu nào tốt nhất?", "Ngộ Đạo Trà và Định Thần Hương"],
-  ["Nguyên Anh có thể thi triển thần thông nào?", "Di hình hoán vị, thu nhỏ đại địa"],
-  ["Bản chất của Hóa Thần Kỳ là gì?", "Nguyên Anh dung hợp Thiên Địa Quy Tắc, cảm ngộ Ý Cảnh"],
-  ["Điều kiện tiên quyết để bước vào Hóa Thần là gì?", "Ngộ ra ít nhất một loại Ý Cảnh hoặc Quy Tắc"],
-  ["Hóa Thần tu sĩ thường hóa thân phàm nhân để làm gì?", "Trải nghiệm Hóa Thần Phàm Gian"],
-  ["Ý Cảnh nào thuộc hàng chí cao?", "Sinh Tử, Không Gian và Luân Hồi Ý Cảnh"],
-  ["Tâm Ma Hóa Thần thường biến thành hình dạng gì?", "Bản thể thứ hai đại diện mặt tối và chấp niệm"],
-  ["Hóa Thần có thể thao túng thứ gì trong giao tranh?", "Năng lượng Thiên Địa Quy Tắc xung quanh"],
-  ["Lĩnh Vực của tu sĩ Hóa Thần là gì?", "Không gian quy tắc riêng do tu sĩ làm chủ"],
-  ["Hóa Thần Viên Mãn cần lĩnh ngộ gì để lên Luyện Hư?", "Hư Không Chi Đạo"],
-  ["Thọ nguyên tu sĩ Hóa Thần đạt tới bao nhiêu?", "5.000 năm"],
-  ["Hóa Thần rơi vào Tà Đạo, Ý Cảnh sẽ biến thành gì?", "Ma Vực hoặc Tà Ý Cảnh"],
-  ["Ý nghĩa chữ Hư trong Luyện Hư là gì?", "Luyện Hóa Hư Không, biến thân thể nhập vào hư vô"],
-  ["Luyện Hư bắt đầu tiếp xúc cấp độ thế giới nào?", "Linh Giới hoặc Thượng Giới Quy Tắc"],
-  ["Gặp vết nứt không gian, tu sĩ Luyện Hư cần làm gì?", "Nhập Hư Không Quy Tắc để chống đỡ và di chuyển"],
-  ["Tâm ma Luyện Hư nguy hiểm ở điểm nào?", "Làm tu sĩ vĩnh viễn lạc trong Hư Không"],
-  ["Pháp Tướng Thiên Địa Luyện Hư có đặc điểm gì?", "Ngưng tụ khổng lồ hàng ngàn trượng mang uy áp quy tắc"],
-  ["Luyện Hư khác Hóa Thần ở điểm cốt lõi nào?", "Luyện Hư dung hợp quy tắc vào thân thể"],
-  ["Thánh Thể Hư Không giúp tu sĩ làm gì?", "Tự do đi lại trong hư không không sợ bão không gian"],
-  ["Suy kiếp của tu sĩ Luyện Hư gọi là gì?", "Thiên Nhân Ngũ Suy"],
-  ["Tu sĩ Luyện Hư có thọ nguyên khoảng bao nhiêu?", "10.000 năm"],
-  ["Dung nạp Hư Không Linh Khí đòi hỏi điều gì?", "Đạo tâm thanh tĩnh không chút tạp niệm"],
-  ["Hợp Thể Kỳ có nghĩa là gì?", "Thể Xác, Nguyên Anh và Thiên Địa Quy Tắc hợp làm một"],
-  ["Sức mạnh tu sĩ Hợp Thể thay đổi ra sao?", "Nhất cử nhất động đều đại diện Thiên Địa Uy Áp"],
-  ["Tâm Ma Kiếp Hợp Thể nguy hiểm nhất là gì?", "Nguyên Anh và Thân Xác nứt vỡ không thể dung hợp"],
-  ["Phân Thân Thuật Hợp Thể khác biệt thế nào?", "Phân thân có chiến lực gần tương đương Bản Thể"],
-  ["Độ Kiếp Hợp Thể cần vượt qua loại Lôi Kiếp nào?", "Lục Cửu hoặc Bát Thập Nhất Trọng Thiên Kiếp"],
-  ["Vật phẩm bảo mệnh thường có của tu sĩ Hợp Thể là gì?", "Tiên Phù hoặc Thế Tử Phù"],
-  ["Uy áp Hợp Thể đối với tu sĩ cấp thấp có thể làm gì?", "Khiến đối phương quỳ rạp, vỡ nát Đạo tâm"],
-  ["Ngộ ra Đại Đạo Quy Tắc, tu sĩ Hợp Thể sẽ thế nào?", "Chạm tới ngưỡng cửa Đại Thừa Kỳ"],
-  ["Thọ nguyên tu sĩ Hợp Thể khoảng bao nhiêu?", "20.000 - 30.000 năm"],
-  ["Dung hợp Thân Xác và Nguyên Anh thất bại, kết cục là gì?", "Thân tử đạo tiêu, hóa thành tro bụi"],
-  ["Tu sĩ Đại Thừa được tôn xưng là gì?", "Chân Nhân, Đôn Đại Đạo Giả hoặc Chuẩn Tiên"],
-  ["Nhiệm vụ chính của tu sĩ Đại Thừa là gì?", "Chuyển hóa Linh lực thành Tiên Nguyên Lực, chuẩn bị Phi Thăng"],
-  ["Đại Thừa khác các cảnh giới trước ở điểm nào?", "Đã chạm tới cực hạn của Hạ Giới"],
-  ["Tâm Ma ở Đại Thừa Kỳ gọi là gì?", "Tiên Chấp Tâm Ma"],
-  ["Linh lực Đại Thừa dần biến đổi thành gì?", "Tiên Nguyên Khí hoặc Tiên Chi Lực"],
-  ["Đại chiến giữa hai tu sĩ Đại Thừa có thể dẫn đến gì?", "Vỡ nát không gian, diệt vong cả một đại lục"],
-  ["Tu sĩ Đại Thừa có thể sống bao lâu ở Hạ Giới?", "Gần như vô tận, trên 50.000 năm cho tới Độ Kiếp"],
-  ["Bảo vật tu sĩ Đại Thừa thường dùng cấp nào?", "Bán Tiên Khí hoặc Chuẩn Tiên Khí"],
-  ["Trước Độ Kiếp để Phi Thăng, tu sĩ Đại Thừa cần gì?", "Tịnh hóa hoàn toàn Đạo tâm, đạt Viên Mãn tuyệt đối"],
-  ["Lạc Tiên Kiếp xảy ra khi nào?", "Khi Ma tâm xâm nhập lúc chuyển hóa Tiên Nguyên"],
-  ["Độ Kiếp Kỳ đại diện cho khoảnh khắc nào?", "Đón nhận Cửu Thiên Cửu Trọng Tiên Kiếp để Phi Thăng"],
-  ["Cửu Cửu Trọng Lôi Kiếp có sức mạnh ra sao?", "Hủy diệt vạn vật, chỉ Đạo Tâm và Tiên Thể hoàn hảo mới sống sót"],
-  ["Sau khi vượt qua Lôi Kiếp, hiện tượng gì xuất hiện?", "Tiên Quang Tiếp Dẫn từ Tiên Giới chiếu xuống"],
-  ["Lôi Kiếp thất bại nhưng Nguyên Hồn sống sót, tu sĩ thành gì?", "Tán Tiên"],
-  ["Tâm Ma cuối cùng trước Phi Thăng gọi là gì?", "Cửu Ung Tâm Ma Kiếp"],
-  ["Chống lại Cửu Cửu Trọng Lôi Kiếp cần chuẩn bị gì?", "Tiên Trận, Chuẩn Tiên Khí, Tẩy Tâm Đan và Đạo Tâm bất biến"],
-  ["Thân Tử Đạo Tiêu trong Độ Kiếp nghĩa là gì?", "Thân xác và thần thức bị thiên lôi đánh thành tro bụi"],
-  ["Khi Tiên Quang Tiếp Dẫn xuất hiện, tu sĩ sẽ làm gì?", "Tái tạo cơ thể thành Tiên Thể, bước lên Tiên Giới"],
-  ["Nghịch Thiên Cải Mệnh trong tu tiên có ý nghĩa gì?", "Vượt qua quy luật sinh lão bệnh tử để chứng Trường Sinh Tiên Đạo"],
-  ["Tán Tiên phải đối mặt điều khủng khiếp nhất là gì?", "Bách Niên Tiên Kiếp ngày càng mạnh cho đến khi diệt vong"],
-];
+const QUIZ_REALM_LEVELS = [9, 6, 6, 6, 6, 6, 6, 9, 9] as const;
 
-const WRONG_ANSWERS = ["Nuốt linh thạch để tăng cảnh giới", "Rời bỏ đạo tâm và chọn đường tắt", "Không liên quan đến tu hành"] as const;
-const QUIZ_QUESTIONS: QuizQuestion[] = REALM_QUESTIONS.map(([question, correct], index) => ({
-  question,
-  answers: [correct, WRONG_ANSWERS[0], WRONG_ANSWERS[1], WRONG_ANSWERS[2]],
-  correctIndex: 0,
-  stage: Math.floor(index / 10),
-}));
+function questionPoolForStage(stage: number): RealmQuestionItem[] {
+  const safeStage = Math.max(0, stage);
+  let realmIndex = 0;
+  let firstStageInRealm = 0;
+
+  for (let index = 0; index < QUIZ_REALM_LEVELS.length; index++) {
+    const levels = QUIZ_REALM_LEVELS[index] ?? 1;
+    if (safeStage < firstStageInRealm + levels || index === QUIZ_REALM_LEVELS.length - 1) {
+      realmIndex = index;
+      break;
+    }
+    firstStageInRealm += levels;
+  }
+
+  const realmLevels = QUIZ_REALM_LEVELS[realmIndex] ?? 1;
+  const levelIndex = Math.min(realmLevels - 1, Math.max(0, safeStage - firstStageInRealm));
+  const stageGroup = Math.min(2, Math.floor((levelIndex * 3) / realmLevels));
+  const realmKey = QUIZ_REALM_KEYS[realmIndex] ?? QUIZ_REALM_KEYS[0];
+  const realmQuestions = REALM_QUESTIONS_DATABASE[realmKey] ?? [];
+  const groupedQuestions = realmQuestions.filter((item) => item.stageGroup === stageGroup);
+  return groupedQuestions.length > 0 ? groupedQuestions : realmQuestions;
+}
 
 export function createQuizEvent(stage: number, realmName: string): QuizEventData {
-  const realmQuestions = QUIZ_QUESTIONS.filter((question) => question.stage === Math.min(8, Math.max(0, stage)));
-  const question = (realmQuestions[Math.floor(Math.random() * realmQuestions.length)] ?? QUIZ_QUESTIONS[0])!;
-  const answers = [...question.answers];
-  const correct = answers[question.correctIndex]!;
+  const realmQuestions = questionPoolForStage(stage);
+  const question = realmQuestions[Math.floor(Math.random() * realmQuestions.length)];
+  if (!question) {
+    throw new Error("Không tìm thấy câu hỏi Khảo Tâm Ma phù hợp");
+  }
+  const answers = [question.correct, ...question.wrongs];
+  const correct = question.correct;
   for (let i = answers.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [answers[i], answers[j]] = [answers[j]!, answers[i]!];
