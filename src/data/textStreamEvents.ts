@@ -106,7 +106,7 @@ export const EVENTS = [
     linhKhi: 5,
   },
   {
-    text: "tìm thấy một bình Thanh Dược Dịch bị bỏ rơi dưới gốc cây cổ thụ. [+ 10% tu vi]",
+    text: "tìm thấy một bình Thanh Dược Dịch bị bỏ rơi dưới gốc cây cổ thụ, ngươi chuyên tâm luyện hóa. [+ 10% tu vi]",
     type: "reward",
     linhThach: 0,
     linhKhi: 10,
