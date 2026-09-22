@@ -547,6 +547,6 @@ export function useCultivation() {
     loaded,
     flash,
     seedReveal,
-    actions: { meditate, breakthrough, brew, usePill, explore, equip, rename, reset, onboard, learnManual, equipManual, resolveAdventure, dismissNotice, dismissSeedReveal },
+    actions: { meditate, breakthrough, brew, usePill, explore, equip, equipSlot: equip, rename, reset, onboard, learnManual, equipManual, resolveAdventure, dismissNotice, dismissSeedReveal },
   };
 }
