@@ -436,7 +436,7 @@ export const EVENTS = [
     linhKhi: 15,
   },
   {
-    text: "học được mẹo thu nạp linh khí nhanh hơn từ sách cũ. [+ 5% tu vi]",
+    text: "học được mẹo thu nạp linh khí nhanh hơn từ 1 cuốn sách cũ. [+ 5% tu vi]",
     type: "reward",
     linhThach: 0,
     linhKhi: 5,
