@@ -680,7 +680,7 @@ export const EVENTS = [
   // II. RỦI RO & TỔN THẤT (100 Sự Kiện -Linh Thạch / -Linh Khí)
   // ==========================================
   {
-    text: "bị sương độc làm hoa mắt, phải vận công xua tan. [- 15% tu vi]",
+    text: "bị sương độc làm hoa mắt, ngươi phải vận công xua tan. [- 15% tu vi]",
     type: "penalty",
     linhThach: 0,
     linhKhi: -15,
