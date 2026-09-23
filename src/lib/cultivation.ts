@@ -422,9 +422,9 @@ export interface Encounter {
 /** Dữ liệu sự kiện đầy đủ; mỗi câu là một kết quả hoàn chỉnh, không ghép chuỗi. */
 const ADVENTURE_EVENT_RECORDS: Encounter[] = [
   {
-    text: "Cao nhân bên thác bạc truyền cho ngươi một đoạn tâm pháp thất truyền. [+ 15% tu vi]",
+    text: "Cao nhân bên thác bạc truyền cho ngươi một đoạn tâm pháp thất truyền. [+ 20% tu vi]",
     kind: "epic",
-    qiPct: 0.15,
+    qiPct: 0.2,
   },
   {
     text: "Bí cảnh cổ mở cửa, ngươi lĩnh hội được quy luật vận hành linh khí. [+ 20% tu vi]",
