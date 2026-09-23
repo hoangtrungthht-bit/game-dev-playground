@@ -1076,7 +1076,7 @@ export const EVENTS = [
     linhKhi: 0,
   },
   {
-    text: "bị ám ảnh bởi cơn ác mộng thiên kiếp, ngơi tỉnh dây trong hốt hoẳng tột độ, tu vi suy sụp. [- 30% tu vi]",
+    text: "bị ám ảnh bởi cơn ác mộng thiên kiếp, ngươi tỉnh dây trong hốt hoảng tột độ, tu vi suy sụp. [- 30% tu vi]",
     type: "penalty",
     linhThach: 0,
     linhKhi: -30,
