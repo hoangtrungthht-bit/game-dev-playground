@@ -859,9 +859,10 @@ export const EVENTS = [
     linhThach: -0,
     linhKhi: -25,
   },
-  { text: "bị Hỏa Hồ cào rách tay. [- 20% tu vi]", 
-    type: "penalty", 
-    linhThach: 0, 
+  {
+    text: "bị Hỏa Hồ cào rách tay. [- 20% tu vi]",
+    type: "penalty",
+    linhThach: 0,
     linhKhi: -20,
   },
   {
@@ -889,10 +890,10 @@ export const EVENTS = [
     linhKhi: -20,
   },
   {
-    text: "bị quấy rối bởi âm thanh của quỷ sai đêm. [- 35% tu vi]",
+    text: "bị quấy rối bởi âm thanh của quỷ sai đêm, ngươi cố gắng thâu thần bế quan. [- 15% tu vi]",
     type: "penalty",
     linhThach: 0,
-    linhKhi: -35,
+    linhKhi: -15,
   },
   {
     text: "đánh mất một cuốn sách hướng dẫn nhập môn. [- 10% tu vi] [- 15 Linh Thạch]",
@@ -901,9 +902,9 @@ export const EVENTS = [
     linhKhi: -10,
   },
   {
-    text: "bị dị ứng với phấn hoa của Linh Cúc. [- 15% tu vi]",
+    text: "bị dị ứng với phấn hoa của Linh Cúc, ngươi ngứa ngáy khắp người, hô hấp khó khăn, may có viên đan dược giải độc. [- 15% tu vi]  [- 25 Linh Thạch]",
     type: "penalty",
-    linhThach: 0,
+    linhThach: -25,
     linhKhi: -15,
   },
   {
@@ -913,10 +914,10 @@ export const EVENTS = [
     linhKhi: 0,
   },
   {
-    text: "bị ảo giác dẫn lối đi lạc trong sương mù. [- 45% tu vi]",
+    text: "bị ảo giác dẫn lối đi lạc trong sương mù. [- 15% tu vi]",
     type: "penalty",
     linhThach: 0,
-    linhKhi: -45,
+    linhKhi: -15,
   },
   {
     text: "bị ma trùng cắn hỏng túi áo. [- 5% tu vi] [- 20 Linh Thạch]",
@@ -925,7 +926,7 @@ export const EVENTS = [
     linhKhi: -5,
   },
   {
-    text: "bị ảnh hưởng bởi trận pháp cuồng phong. [- 50% tu vi]",
+    text: "bị ảnh hưởng bởi trận pháp cuồng phong. [- 20% tu vi]",
     type: "penalty",
     linhThach: 0,
     linhKhi: -50,
@@ -937,22 +938,22 @@ export const EVENTS = [
     linhKhi: 0,
   },
   {
-    text: "bị ngã xuống bùn lầy, tốn công làm sạch. [- 20% tu vi] [- 5 Linh Thạch]",
+    text: "bị ngã xuống bùn lầy trong 1 kết giới của ma tu, ngươi tiêu tốn nhiều tu vi để thoát ra, quần áo dơ bẩn phải kiếm quán trọ tắm giặt. [- 10% tu vi] [- 35 Linh Thạch]",
     type: "penalty",
-    linhThach: -5,
-    linhKhi: -20,
+    linhThach: -35,
+    linhKhi: -10,
   },
   {
-    text: "bị tiêu hao sức lực khi vượt qua đèo cao. [- 30% tu vi]",
+    text: "ngươi bị tiêu hao sức lực khi vượt qua đèo cao đầy sương giá. [- 10% tu vi]",
+    type: "penalty",
+    linhThach: 0,
+    linhKhi: -10,
+  },
+  {
+    text: "bị gián đoạn mạch suy nghĩ khi ngộ đạo. [- 30% tu vi]",
     type: "penalty",
     linhThach: 0,
     linhKhi: -30,
-  },
-  {
-    text: "bị gián đoạn mạch suy nghĩ khi ngộ đạo. [- 40% tu vi]",
-    type: "penalty",
-    linhThach: 0,
-    linhKhi: -40,
   },
   {
     text: "đánh vỡ bình chứa nước linh tuyền. [- 15% tu vi] [- 15 Linh Thạch]",
@@ -961,10 +962,10 @@ export const EVENTS = [
     linhKhi: -15,
   },
   {
-    text: "bị Yêu Báo vồ hụt nhưng bị thương ở vai. [- 35% tu vi]",
+    text: "bị Yêu Báo vồ hụt nhưng bị thương ở vai. [- 25% tu vi]",
     type: "penalty",
     linhThach: 0,
-    linhKhi: -35,
+    linhKhi: -25,
   },
   {
     text: "bị tốn chi phí chữa trị vết thương nhỏ. [- 25 Linh Thạch]",
@@ -973,40 +974,40 @@ export const EVENTS = [
     linhKhi: 0,
   },
   {
-    text: "bị kiệt sức vì đi bộ dưới trời nắng gắt. [- 25% tu vi]",
+    text: "bị kiệt sức vì đi bộ dưới trời nắng gắt, ngươi may mắn gặp một y giả ra tay tương trợ. [- 15% tu vi]",
     type: "penalty",
     linhThach: 0,
-    linhKhi: -25,
+    linhKhi: -15,
   },
   {
-    text: "bị Ma Tu quấy phá làm mất tập trung. [- 45% tu vi]",
+    text: "bị Ma Tu quấy phá làm mất tập trung, ngươi trúng tâm thuật ấn của hắn, may mắn có pháp khí hộ thân mới trốn thoát được. [- 35% tu vi]",
     type: "penalty",
     linhThach: 0,
-    linhKhi: -45,
+    linhKhi: -35,
   },
   {
-    text: "làm hỏng cán kiếm gỗ khi luyện tập. [- 20 Linh Thạch]",
+    text: "làm hỏng cán thanh kiếm khi luyện tập, phải tốn linh thạch để sửa chữa. [- 20 Linh Thạch]",
     type: "penalty",
     linhThach: -20,
     linhKhi: 0,
   },
   {
-    text: "bị trúng hơi độc từ bãi phân yêu thú. [- 20% tu vi]",
+    text: "bị trúng hơi độc từ bãi phân yêu thú, ngươi nôn mửa suốt 2 ngày. [- 20% tu vi]",
     type: "penalty",
     linhThach: 0,
     linhKhi: -20,
   },
   {
-    text: "bị thu phí đỗ đỗ thuyền tại bến sông. [- 15 Linh Thạch]",
+    text: "bị thu phí đỗ thuyền tại bến sông khi đi tìm bí pháp. [- 15 Linh Thạch]",
     type: "penalty",
     linhThach: -15,
     linhKhi: 0,
   },
   {
-    text: "bị tốn năng lượng để xua đuổi muỗi núi. [- 15% tu vi]",
+    text: "theo chỉ thị tông môn : đi lịch luyện tiêu diệt ma thú trên Nhị Long Sơn.Trời tối, ngươi dừng lại nghỉ bên gốc cây, bị đám muỗi núi làm phiền cả đêm. [- 5% tu vi]",
     type: "penalty",
     linhThach: 0,
-    linhKhi: -15,
+    linhKhi: -5,
   },
   {
     text: "bị giật mình bởi tiếng sấm lớn làm lệch khí huyết. [- 30% tu vi]",
