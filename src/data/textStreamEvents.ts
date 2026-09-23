@@ -1196,7 +1196,7 @@ export const EVENTS = [
     linhKhi: 0,
   },
   {
-    text: "ngươi leo lên đến đỉnh Cửu Vân Sơn nhưng choáng váng do áp suất trên cao. [- 15% tu vi]",
+    text: "leo lên đến đỉnh Cửu Vân Sơn nhưng choáng váng do áp suất trên cao. [- 15% tu vi]",
     type: "penalty",
     linhThach: 0,
     linhKhi: -15,
