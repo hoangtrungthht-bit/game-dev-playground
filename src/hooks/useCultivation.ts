@@ -355,8 +355,8 @@ export function useCultivation() {
       ? rollStoneDelta(s.stones, 0.2, 0.4, epic.stones > 0 ? 1 : -1)
       : { amount: 0, pct: 0 };
     const epicText = epicStone.amount
-      ? replaceStoneLog(`Kỳ Duyên giáng thế: ${epic.text}`, epicStone.amount, epicStone.pct)
-      : `Kỳ Duyên giáng thế: ${epic.text}`;
+      ? replaceStoneLog(`Duyên lành khởi phát: ${epic.text}`, epicStone.amount, epicStone.pct)
+      : `Duyên lành khởi phát: ${epic.text}`;
     return {
       ...s,
       herbs,

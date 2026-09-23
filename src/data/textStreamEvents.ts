@@ -13,7 +13,7 @@ export const ACTIONS = [
   "Men theo vách núi hiểm trở,",
   "Núp dưới bóng cổ thụ rậm rạp,",
   "Bên cạnh hồ nước đóng băng,",
-  "Trên con đường mòn phủ đầy mêu xanh,",
+  "Trên con đường mòn phủ đầy rêu xanh,",
 ];
 
 // 100 sự kiện trung lập: không thay đổi tu vi, linh thạch hay linh thảo.
@@ -1028,7 +1028,7 @@ export const EVENTS = [
     linhKhi: -15,
   },
   {
-    text: "tốn tiền sửa lại đôi giày tu tiên bị rách sau khi đạp phải thanh kiếm gãy ẩn dưới đát. [- 20 Linh Thạch]",
+    text: "tốn tiền sửa lại đôi giày tu tiên bị rách sau khi đạp phải thanh kiếm gãy ẩn dưới đất. [- 20 Linh Thạch]",
     type: "penalty",
     linhThach: -20,
     linhKhi: 0,
