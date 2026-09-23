@@ -1242,40 +1242,40 @@ export const EVENTS = [
     linhKhi: -10,
   },
   {
-    text: "bị phạt do đậu súc vật sai quy định. [- 25 Linh Thạch]",
+    text: "ngươi bị phạt do để vật cưỡi sai quy định khi dến thành Trường An. [- 25 Linh Thạch]",
     type: "penalty",
     linhThach: -25,
     linhKhi: 0,
   },
   {
-    text: "bị tốn năng lượng xua đuổi ma hỏa. [- 35% tu vi]",
-    type: "penalty",
-    linhThach: 0,
-    linhKhi: -35,
-  },
-  {
-    text: "bị mất một ít dược liệu do sương ẩm. [- 10% tu vi] [- 20 Linh Thạch]",
-    type: "penalty",
-    linhThach: -20,
-    linhKhi: -10,
-  },
-  {
-    text: "bị sỏi đá chui vào giày gây đau chân. [- 15% tu vi]",
+    text: "hao tốn năng lượng xua đuổi ma hỏa đang hoành hành ở tiểu trấn. [- 15% tu vi]",
     type: "penalty",
     linhThach: 0,
     linhKhi: -15,
   },
   {
-    text: "bị tốn tiền xe ngựa đi về tông môn. [- 30 Linh Thạch]",
+    text: "ngươi hao tổn tu vi khi đụng độ 1 con giao long ngàn năm ở đầm Bích La. [- 10% tu vi] ",
+    type: "penalty",
+    linhThach: -0,
+    linhKhi: -10,
+  },
+  {
+    text: "bị ác lang truy đuổi ráo riết trên núi Ma Quan, ngươi vận hết công pháp chống trả thoát thân. [- 15% tu vi]",
+    type: "penalty",
+    linhThach: 0,
+    linhKhi: -15,
+  },
+  {
+    text: "ngươi tốn tiền xe ngựa đi về tông môn. [- 30 Linh Thạch]",
     type: "penalty",
     linhThach: -30,
     linhKhi: 0,
   },
   {
-    text: "bị kiệt sức sau trận giông bão bất ngờ. [- 50% tu vi]",
+    text: "bị kiệt sức sau trận đại chién của tông môn với Huyết Ma tông. [- 30% tu vi]",
     type: "penalty",
     linhThach: 0,
-    linhKhi: -50,
+    linhKhi: -30,
   },
 ];
 
