@@ -28,7 +28,7 @@ export const NEUTRAL_EVENTS = Array.from({ length: 100 }, (_, index) => ({
     "quan sát dấu chân thú rừng rồi chọn lối khác để đi.",
     "ngồi dưới bóng cây, lặng lẽ nhìn nắng xuyên qua kẽ lá.",
     "nghe tiếng chuông tông môn vọng lại từ xa.",
-    "vô tình phát hiện ra một bộ xương khô của tiền bối và tấm bọc da thú ghi chép công pháp,ngươi cảm ngộ về thế sự vô thường.",
+    "vô tình phát hiện ra một bộ xương khô của tiền bối và tấm bọc da thú ghi chép công pháp,liền cảm ngộ về thế sự vô thường.",
     "ẩn mình thật kỹ để quan sát hai vị đại năng tranh đoạt thiên tài địa bảo.",
     "lướt qua ngọn núi hiểm trở để tìm kiếm tung tích bí cảnh thượng cổ",
     "ngắm nhìn đàn hạc trắng tung cánh bay lượn qua tầng mây hoàng hôn mà tâm hồn bỗng trở nên thư thái, nhẹ bẫng",
@@ -436,7 +436,7 @@ export const EVENTS = [
     linhKhi: 15,
   },
   {
-    text: "học được mẹo thu nạp linh khí nhanh hơn từ sách cũ. [+ 5% tu vi]",
+    text: "học được mẹo thu nạp linh khí nhanh hơn từ 1 cuốn sách cũ. [+ 5% tu vi]",
     type: "reward",
     linhThach: 0,
     linhKhi: 5,
@@ -622,7 +622,7 @@ export const EVENTS = [
     linhKhi: 15,
   },
   {
-    text: "tiêu diệt Ma Bọ Cạp ở vùng sa mạc, lấy được ngọc độc. [+ 15% tu vi] [+ 45 Linh Thạch]",
+    text: "tiêu diệt Ma Bọ Cạp khổng lồ, lấy được ngọc độc. [+ 15% tu vi] [+ 45 Linh Thạch]",
     type: "reward",
     linhThach: 45,
     linhKhi: 15,
