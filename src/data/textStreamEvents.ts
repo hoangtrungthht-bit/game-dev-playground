@@ -1154,10 +1154,10 @@ export const EVENTS = [
     linhKhi: 0,
   },
   {
-    text: "bị tức ngực do hít phải khí lưu huỳnh. [- 35% tu vi]",
+    text: "bị tức ngực do hít phải khí lưu huỳnh khi núi lửa bất ngờ phun trào. [- 25% tu vi]",
     type: "penalty",
     linhThach: 0,
-    linhKhi: -35,
+    linhKhi: -25,
   },
   {
     text: "bị làm phiền khi đang ngủ trưa. [- 15% tu vi]",
