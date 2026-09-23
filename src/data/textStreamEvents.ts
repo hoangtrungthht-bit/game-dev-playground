@@ -622,7 +622,7 @@ export const EVENTS = [
     linhKhi: 15,
   },
   {
-    text: "tiêu diệt Ma Bọ Cạp ở vùng sa mạc, lấy được ngọc độc. [+ 15% tu vi] [+ 45 Linh Thạch]",
+    text: "tiêu diệt Ma Bọ Cạp khổng lồ, lấy được ngọc độc. [+ 15% tu vi] [+ 45 Linh Thạch]",
     type: "reward",
     linhThach: 45,
     linhKhi: 15,
