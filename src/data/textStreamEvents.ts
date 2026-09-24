@@ -13,7 +13,7 @@ export const ACTIONS = [
   "Men theo vách núi hiểm trở,",
   "Dưới bóng cổ thụ rậm rạp,",
   "Bên cạnh hồ nước đóng băng,",
-  "ngồi trên 1 tửu lâu nhỏ,",
+  "Ngồi trên 1 tửu lâu nhỏ,",
   "Trên con đường mòn phủ đầy rêu xanh,",
 ];
 
