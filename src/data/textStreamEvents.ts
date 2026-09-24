@@ -987,10 +987,10 @@ export const EVENTS = [
     linhKhi: 0,
   },
   {
-    text: "bị kiệt sức vì đi bộ dưới trời nắng gắt, ngươi may mắn gặp một y giả ra tay tương trợ. [- 15% tu vi]",
+    text: "bị kiệt sức vì đi bộ dưới trời nắng gắt, may mắn gặp một y giả ra tay tương trợ. [- 10% tu vi]",
     type: "penalty",
     linhThach: 0,
-    linhKhi: -15,
+    linhKhi: -10,
   },
   {
     text: "bị Ma Tu quấy phá làm mất tập trung, ngươi trúng tâm thuật ấn của hắn, may mắn có pháp khí hộ thân mới trốn thoát được. [- 35% tu vi]",
