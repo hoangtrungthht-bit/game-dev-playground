@@ -13,6 +13,7 @@ export const ACTIONS = [
   "Men theo vách núi hiểm trở,",
   "Dưới bóng cổ thụ rậm rạp,",
   "Bên cạnh hồ nước đóng băng,",
+  "ngồi trên 1 tửu lâu nhỏ,",
   "Trên con đường mòn phủ đầy rêu xanh,",
 ];
 
@@ -66,14 +67,14 @@ const HERB_EVENTS = [
     huyetChi: (index % 2) + 1,
   })),
   ...Array.from({ length: 10 }, (_, index) => ({
-    text: `vượt qua sườn núi băng giá và hái được Băng Liên quý hiếm. [+ 1 Băng Liên]`,
+    text: `vượt qua sườn núi băng giá và hái được Băng Liên quý hiếm. [+ 2 Băng Liên]`,
     type: "reward" as const,
     linhThach: 0,
     linhKhi: 0,
     bangLien: 1,
   })),
   ...Array.from({ length: 5 }, (_, index) => ({
-    text: `lần theo long khí dưới vực sâu và phát hiện Long Đảm Thảo trân quý. [+ 1 Long Đảm Thảo]`,
+    text: `lần theo long khí dưới vực sâu và phát hiện Long Đảm Thảo trân quý. [+ 2 Long Đảm Thảo]`,
     type: "reward" as const,
     linhThach: 0,
     linhKhi: 0,
