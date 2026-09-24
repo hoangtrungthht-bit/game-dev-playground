@@ -104,7 +104,7 @@ export const EVENTS = [
     text: "ngồi thiền một canh giờ, ngộ ra chút ý niệm thiên địa. [+ 10% tu vi]",
     type: "reward",
     linhThach: 0,
-    linhKhi: 50,
+    linhKhi: 10,
   },
   {
     text: "gặp một vị thương nhân dạo, đổi chút vật phẩm lấy linh thạch. [+ 25 Linh Thạch]",
